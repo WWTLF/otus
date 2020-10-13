@@ -28,3 +28,8 @@ kubectl apply -f ingress.yaml
 TODO: Добавить манифесты секретов
 
 ### Способ 2: Установка с помощью HELM
+
+
+# Полезные ссылки
+https://12factor.net/ -  best practices
+https://flagger.app/ - feature toggling
