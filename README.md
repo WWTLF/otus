@@ -12,6 +12,8 @@ curl http://arch.homework/otusapp/borisershov/health
 
 ### Способ 1. БД из HELM, Сервисы из kubectl apply -f:
 
+Все манифесты тут: https://github.com/WWTLF/otus/tree/master/otus1.5
+
 Для установки БД:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
