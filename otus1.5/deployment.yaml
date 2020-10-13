@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userlist-deployment
+  labels:
+    app: userlist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userlist
+  template:
+    metadata:
+      labels:
+        app: userlist
+    spec:
+      containers:
+      - name: userlist
+        image: wwtlf/user_list:0.3
+        ports:
+          - containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        

@@ -1,2 +1,3 @@
-.idea
-user-list/user-list-server
+.idea/
+user-list-src/user-list-server
+*.tgz
