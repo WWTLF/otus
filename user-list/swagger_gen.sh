@@ -1,0 +1,1 @@
+swagger generate server -A UserList -f ./otus55-users-1.0.0-resolved.yaml

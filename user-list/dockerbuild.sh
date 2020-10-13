@@ -1,0 +1,1 @@
+docker build -t wwtlf/user_list:0.3 .
