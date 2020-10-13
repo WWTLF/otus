@@ -32,4 +32,5 @@ TODO: Добавить манифесты секретов
 
 # Полезные ссылки
 https://12factor.net/ -  best practices
+
 https://flagger.app/ - feature toggling
