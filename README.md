@@ -8,26 +8,16 @@
 curl http://arch.homework/otusapp/borisershov/health
 ```
 
-## Задание 1.5. Основы работы с Kubernetes (часть 3)
+## Задание 1.6. Основы работы с Kubernetes (часть 3)
 
-### Способ 1. БД из HELM, Сервисы из kubectl apply -f:
+Для установки:
+```
+helm repo add wwtlf https://wwtlf.github.io/userlist
+helm repo update
+helm install otus userlist -f values.yaml  
+```
 
-Все манифесты тут: https://github.com/WWTLF/otus/tree/master/otus1.5
-
-Для установки БД:
-```
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install user-list-db bitnami/postgresql 
-```
-Далее применение манифестов: 
-```
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-kubectl apply -f ingress.yaml
-```
-TODO: Добавить манифесты секретов
-
-### Способ 2: Установка с помощью HELM
+Исходные коды лежат тут: https://github.com/WWTLF/userlist
 
 
 # Полезные ссылки
