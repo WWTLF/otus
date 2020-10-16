@@ -24,3 +24,4 @@ helm install otus userlist -f values.yaml
 - https://12factor.net/ -  best practices
 - https://flagger.app/ - feature toggling
 - https://medium.com/hackernoon/wrong-ways-of-defining-service-boundaries-d9e313007bcc - decomposition
+- https://skaffold.dev/docs/install/ - CI/CD инструмент
