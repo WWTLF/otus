@@ -1,0 +1,80 @@
+{{- $fullName := include "userlist.fullname" . -}}
+{{- $name := include "userlist.name" . -}}
+{{- range $index, $job := .Values.deploy_jobs }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Chart.Name }}-{{ $job.name }}
+  annotations:
+    "helm.sh/hook": {{ $job.hook }}
+    "helm.sh/hook-weight": "1{{ $index }}"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  activeDeadlineSeconds: {{ $job.activeDeadlineSeconds }}
+  backoffLimit: 0
+  template:
+    metadata:
+      name: {{ $.Chart.Name }}-{{ $job.name }}
+    spec:         
+      initContainers:
+        - name: check-db-ready
+          image: postgres:latest
+          env:
+            - name: POSTGRESQL_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                    name: {{ $fullName }}-configmap
+                    key: POSTGRESQL_HOSTNAME
+
+            - name: POSTGRESQL_PORT_NUMBER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-configmap
+                  key: POSTGRESQL_PORT_NUMBER
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              until pg_isready -h $POSTGRESQL_HOSTNAME  -p  $POSTGRESQL_PORT_NUMBER; 
+              do echo waiting for database; sleep 2; done;
+      
+      containers:
+        - name: job
+          image: {{ $job.image }}
+          command: {{ $job.command }}
+          imagePullPolicy: IfNotPresent          
+          env:
+            - name: "POSTGRESQL_HOSTNAME"
+              valueFrom:
+                configMapKeyRef:
+                    name: {{ $fullName }}-configmap
+                    key: POSTGRESQL_HOSTNAME
+    
+            - name: "POSTGRESQL_PORT_NUMBER"
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-configmap
+                  key: POSTGRESQL_PORT_NUMBER
+            - name: "POSTGRES_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-secret
+                  key: POSTGRES_USER
+            - name: "POSTGRES_PASSWORD"            
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName }}-secret
+                  key: POSTGRES_PASSWORD
+            - name: "PGPASSWORD"
+              valueFrom:
+                secretKeyRef:
+                    name: {{ $.Release.Name }}-pg
+                    key: postgresql-password
+            - name: "POSTGRESQL_URL"
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-configmap
+                  key: POSTGRESQL_URL
+      restartPolicy: Never
+{{- end }}

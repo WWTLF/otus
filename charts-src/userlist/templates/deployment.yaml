@@ -47,6 +47,27 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: "POSTGRESQL_HOSTNAME"
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "userlist.fullname" . }}-configmap
+                  key: POSTGRESQL_HOSTNAME
+            - name: "POSTGRESQL_PORT_NUMBER"
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "userlist.fullname" . }}-configmap
+                  key: POSTGRESQL_PORT_NUMBER
+            - name: "POSTGRES_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "userlist.fullname" . }}-secret
+                  key: POSTGRES_USER
+            - name: "POSTGRES_PASSWORD"            
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "userlist.fullname" . }}-secret
+                  key: POSTGRES_PASSWORD
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -125,10 +125,12 @@ definitions:
         maxLength: 256
         type: "string"
       firstName:
+        maxLength: 256
         type: "string"
       lastName:
+        maxLength: 256
         type: "string"
-      email:
+      email:      
         type: "string"
         format: "email"
       phone:

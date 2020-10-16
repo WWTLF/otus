@@ -1,0 +1,84 @@
+{{- $fullName := include "userlist.fullname" . -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-create-user"
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:    
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "9"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: check-db-ready
+          image: postgres:latest
+          env:
+            - name: POSTGRESQL_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                    name: {{ $fullName }}-configmap
+                    key: POSTGRESQL_HOSTNAME
+
+            - name: POSTGRESQL_PORT_NUMBER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $fullName }}-configmap
+                  key: POSTGRESQL_PORT_NUMBER
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              until pg_isready -h $POSTGRESQL_HOSTNAME  -p  $POSTGRESQL_PORT_NUMBER; 
+              do echo waiting for database; sleep 2; done;
+      containers:
+      - name: create-user-job
+        env:
+          - name: "POSTGRESQL_HOSTNAME"
+            valueFrom:
+              configMapKeyRef:
+                name: {{ $fullName }}-configmap
+                key: POSTGRESQL_HOSTNAME
+
+          - name: "POSTGRESQL_PORT_NUMBER"
+            valueFrom:
+              configMapKeyRef:
+                name: {{ $fullName }}-configmap
+                key: POSTGRESQL_PORT_NUMBER
+          - name: "POSTGRES_USER"
+            valueFrom:
+              secretKeyRef:
+                name: {{ $fullName }}-secret
+                key: POSTGRES_USER
+          - name: "POSTGRES_PASSWORD"            
+            valueFrom:
+              secretKeyRef:
+                name: {{ $fullName }}-secret
+                key: POSTGRES_PASSWORD
+          - name: "PGPASSWORD"
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Release.Name }}-pg
+                key: postgresql-password
+        image: postgres:latest
+        command:
+          - sh
+          - "-c"
+          - |          
+            export POSTGRESQL_URL="postgres://postgres:$PGPASSWORD@{{ $.Release.Name }}-pg:{{ .Values.image.db.port }}/userlist?sslmode=disable"
+            echo $POSTGRESQL_URL; 
+            psql $POSTGRESQL_URL -c "create user ${POSTGRES_USER} with password '${POSTGRES_PASSWORD}';GRANT CONNECT ON DATABASE userlist TO ${POSTGRES_USER};GRANT USAGE ON SCHEMA public TO ${POSTGRES_USER};" 
+            
+  backoffLimit: 0
