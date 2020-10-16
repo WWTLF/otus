@@ -23,5 +23,4 @@ helm install otus userlist -f values.yaml
 # Полезные ссылки
 - https://12factor.net/ -  best practices
 - https://flagger.app/ - feature toggling
-- https://stackoverflow.com/questions/50218376/managing-db-migrations-on-kubernetes-cluster - database migrations
 - https://medium.com/hackernoon/wrong-ways-of-defining-service-boundaries-d9e313007bcc - decomposition
