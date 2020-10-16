@@ -1,0 +1,53 @@
+apiVersion: v1
+entries:
+  postgresql:
+  - annotations:
+      category: Database
+    apiVersion: v1
+    appVersion: 11.9.0
+    created: "2020-10-16T20:47:14.442172+03:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.x.x
+    description: Chart for PostgreSQL, an object-relational database management system
+      (ORDBMS) with an emphasis on extensibility and on standards-compliance.
+    digest: 243b1d51505bdb340f9155b0d4403b1f316790c18dc292eb874ac00a1caa775c
+    home: https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+    icon: https://bitnami.com/assets/stacks/postgresql/img/postgresql-stack-110x117.png
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    - sql
+    - replication
+    - cluster
+    maintainers:
+    - email: containers@bitnami.com
+      name: Bitnami
+    - email: cedric@desaintmartin.fr
+      name: desaintmartin
+    name: postgresql
+    sources:
+    - https://github.com/bitnami/bitnami-docker-postgresql
+    - https://www.postgresql.org/
+    urls:
+    - https://wwtlf.github.io/userlist/charts/postgresql-9.8.3.tgz
+    version: 9.8.3
+  userlist:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2020-10-16T20:47:14.438976+03:00"
+    dependencies:
+    - alias: pg
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.8.3
+    description: Otus 1.5 Homework
+    digest: cfee726b3f91d94ef2100bcbc76ca6a847587001d133d678693af50871a30bb3
+    name: userlist
+    type: application
+    urls:
+    - https://wwtlf.github.io/userlist/userlist-0.1.0.tgz
+    version: 0.1.0
+generated: "2020-10-16T20:47:14.434219+03:00"
