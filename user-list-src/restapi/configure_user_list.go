@@ -5,6 +5,7 @@ package restapi
 import (
 	"crypto/tls"
 	"net/http"
+	Core "user_list/CORE"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
@@ -25,6 +26,7 @@ func configureFlags(api *operations.UserListAPI) {
 }
 
 func configureAPI(api *operations.UserListAPI) http.Handler {
+	Core.GetInstance().DBInit()
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -45,6 +47,18 @@ func configureAPI(api *operations.UserListAPI) http.Handler {
 	api.HealthcheckHealthCheckHandler = healthcheck.HealthCheckHandlerFunc(func(params healthcheck.HealthCheckParams) middleware.Responder {
 		status := "OK"
 		return healthcheck.NewHealthCheckOK().WithPayload(&models.HealthCheckStatus{Status: &status})
+	})
+
+	api.HealthcheckReadinessHealthCheckHandler = healthcheck.ReadinessHealthCheckHandlerFunc(func(params healthcheck.ReadinessHealthCheckParams) middleware.Responder {
+		if Core.GetInstance().DB != nil {
+			status := "OK"
+			return healthcheck.NewReadinessHealthCheckOK().WithPayload(&models.HealthCheckStatus{Status: &status})
+		} else {
+			var code int32 = 500
+			message := "DB connection is not ready"
+			healthcheck.NewReadinessHealthCheckDefault(500).WithPayload(&models.Error{Code: &code, Message: &message})
+		}
+		return middleware.NotImplemented("operation user.CreateUser has not yet been implemented")
 	})
 
 	if api.UserCreateUserHandler == nil {

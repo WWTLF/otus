@@ -11,15 +11,15 @@ import (
 	golangswaggerpaths "path"
 )
 
-// HealthCheckURL generates an URL for the health check operation
-type HealthCheckURL struct {
+// ReadinessHealthCheckURL generates an URL for the readiness health check operation
+type ReadinessHealthCheckURL struct {
 	_basePath string
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *HealthCheckURL) WithBasePath(bp string) *HealthCheckURL {
+func (o *ReadinessHealthCheckURL) WithBasePath(bp string) *ReadinessHealthCheckURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,15 +27,15 @@ func (o *HealthCheckURL) WithBasePath(bp string) *HealthCheckURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *HealthCheckURL) SetBasePath(bp string) {
+func (o *ReadinessHealthCheckURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *HealthCheckURL) Build() (*url.URL, error) {
+func (o *ReadinessHealthCheckURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/health/liveness"
+	var _path = "/health/readiness"
 
 	_basePath := o._basePath
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
@@ -44,7 +44,7 @@ func (o *HealthCheckURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *HealthCheckURL) Must(u *url.URL, err error) *url.URL {
+func (o *ReadinessHealthCheckURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -55,17 +55,17 @@ func (o *HealthCheckURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *HealthCheckURL) String() string {
+func (o *ReadinessHealthCheckURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *HealthCheckURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *ReadinessHealthCheckURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on HealthCheckURL")
+		return nil, errors.New("scheme is required for a full url on ReadinessHealthCheckURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on HealthCheckURL")
+		return nil, errors.New("host is required for a full url on ReadinessHealthCheckURL")
 	}
 
 	base, err := o.Build()
@@ -79,6 +79,6 @@ func (o *HealthCheckURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *HealthCheckURL) StringFull(scheme, host string) string {
+func (o *ReadinessHealthCheckURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

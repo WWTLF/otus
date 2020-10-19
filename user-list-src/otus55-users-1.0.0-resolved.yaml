@@ -5,12 +5,12 @@ info:
   description: "This is simple client API\n"
   contact:
     email: "schetinnikov@gmail.com"
-  version: "1.0.0"
+  version: "1.0.1"
 tags:
 - name: "user"
   description: "Operations about user"
 paths:
-  /health:
+  /health/liveness:
     get:
       tags:
         - "healthcheck"
@@ -19,11 +19,28 @@ paths:
       operationId: "health check"
       responses:
         "200":
-          description: "user response"
+          description: "Success"
           schema:
             $ref: "#/definitions/HealthCheckStatus"
         default:
           description: "unexpected error"          
+          schema:
+            $ref: "#/definitions/Error"
+
+  /health/readiness:
+    get:
+      tags:
+        - "healthcheck"
+      summary: "health check"
+      description: "Active health check readiness status"
+      operationId: "readiness health check"
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/HealthCheckStatus"
+        default:
+          description: "unexpected error"
           schema:
             $ref: "#/definitions/Error"
   /user:

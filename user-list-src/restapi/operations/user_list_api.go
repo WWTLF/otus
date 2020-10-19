@@ -57,6 +57,9 @@ func NewUserListAPI(spec *loads.Document) *UserListAPI {
 		HealthcheckHealthCheckHandler: healthcheck.HealthCheckHandlerFunc(func(params healthcheck.HealthCheckParams) middleware.Responder {
 			return middleware.NotImplemented("operation healthcheck.HealthCheck has not yet been implemented")
 		}),
+		HealthcheckReadinessHealthCheckHandler: healthcheck.ReadinessHealthCheckHandlerFunc(func(params healthcheck.ReadinessHealthCheckParams) middleware.Responder {
+			return middleware.NotImplemented("operation healthcheck.ReadinessHealthCheck has not yet been implemented")
+		}),
 		UserUpdateUserHandler: user.UpdateUserHandlerFunc(func(params user.UpdateUserParams) middleware.Responder {
 			return middleware.NotImplemented("operation user.UpdateUser has not yet been implemented")
 		}),
@@ -103,6 +106,8 @@ type UserListAPI struct {
 	UserFindUserByIDHandler user.FindUserByIDHandler
 	// HealthcheckHealthCheckHandler sets the operation handler for the health check operation
 	HealthcheckHealthCheckHandler healthcheck.HealthCheckHandler
+	// HealthcheckReadinessHealthCheckHandler sets the operation handler for the readiness health check operation
+	HealthcheckReadinessHealthCheckHandler healthcheck.ReadinessHealthCheckHandler
 	// UserUpdateUserHandler sets the operation handler for the update user operation
 	UserUpdateUserHandler user.UpdateUserHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -192,6 +197,9 @@ func (o *UserListAPI) Validate() error {
 	}
 	if o.HealthcheckHealthCheckHandler == nil {
 		unregistered = append(unregistered, "healthcheck.HealthCheckHandler")
+	}
+	if o.HealthcheckReadinessHealthCheckHandler == nil {
+		unregistered = append(unregistered, "healthcheck.ReadinessHealthCheckHandler")
 	}
 	if o.UserUpdateUserHandler == nil {
 		unregistered = append(unregistered, "user.UpdateUserHandler")
@@ -299,7 +307,11 @@ func (o *UserListAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/health"] = healthcheck.NewHealthCheck(o.context, o.HealthcheckHealthCheckHandler)
+	o.handlers["GET"]["/health/liveness"] = healthcheck.NewHealthCheck(o.context, o.HealthcheckHealthCheckHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/health/readiness"] = healthcheck.NewReadinessHealthCheck(o.context, o.HealthcheckReadinessHealthCheckHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

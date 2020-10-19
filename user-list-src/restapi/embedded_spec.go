@@ -25,10 +25,10 @@ func init() {
     "contact": {
       "email": "schetinnikov@gmail.com"
     },
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "paths": {
-    "/health": {
+    "/health/liveness": {
       "get": {
         "description": "Active health check status",
         "tags": [
@@ -38,7 +38,31 @@ func init() {
         "operationId": "health check",
         "responses": {
           "200": {
-            "description": "user response",
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/HealthCheckStatus"
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/health/readiness": {
+      "get": {
+        "description": "Active health check readiness status",
+        "tags": [
+          "healthcheck"
+        ],
+        "summary": "health check",
+        "operationId": "readiness health check",
+        "responses": {
+          "200": {
+            "description": "Success",
             "schema": {
               "$ref": "#/definitions/HealthCheckStatus"
             }
@@ -255,10 +279,10 @@ func init() {
     "contact": {
       "email": "schetinnikov@gmail.com"
     },
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "paths": {
-    "/health": {
+    "/health/liveness": {
       "get": {
         "description": "Active health check status",
         "tags": [
@@ -268,7 +292,31 @@ func init() {
         "operationId": "health check",
         "responses": {
           "200": {
-            "description": "user response",
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/HealthCheckStatus"
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/health/readiness": {
+      "get": {
+        "description": "Active health check readiness status",
+        "tags": [
+          "healthcheck"
+        ],
+        "summary": "health check",
+        "operationId": "readiness health check",
+        "responses": {
+          "200": {
+            "description": "Success",
             "schema": {
               "$ref": "#/definitions/HealthCheckStatus"
             }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
-
+	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -29,17 +29,13 @@ func GetInstance() *CORE {
 func (core *CORE) DBInit() {
 	log.Info("DB Connection...")
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%s",
-		os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT"))
+		os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRESQL_HOSTNAME"), os.Getenv("POSTGRESQL_PORT_NUMBER"))
 	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
-		log.Errorf("sql.Open(\"postgres\", dbinfo) ", err)
-		panic(err)
+		log.Panic(err)
 	}
 	core.DB = db
 	_, err = db.Exec("select 1")
-	if err != nil {
-		panic("dbinfo = " + dbinfo)
-	}
 	log.Info("Done")
 }
 
@@ -50,9 +46,10 @@ func (core *CORE) DBClose() {
 
 func HandelError(err error, usePanic bool) {
 	if err != nil {
-		log.Error(err)
 		if usePanic {
-			log.Fatal(err)
+			log.Panic(err)
+		} else {
+			log.Error(err)
 		}
 	}
 }
