@@ -22,12 +22,14 @@ type User struct {
 	Email strfmt.Email `json:"email,omitempty"`
 
 	// first name
+	// Max Length: 256
 	FirstName string `json:"firstName,omitempty"`
 
 	// id
 	ID int64 `json:"id,omitempty"`
 
 	// last name
+	// Max Length: 256
 	LastName string `json:"lastName,omitempty"`
 
 	// phone
@@ -43,6 +45,14 @@ func (m *User) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateEmail(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateFirstName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateLastName(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -63,6 +73,32 @@ func (m *User) validateEmail(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("email", "body", "email", m.Email.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *User) validateFirstName(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.FirstName) { // not required
+		return nil
+	}
+
+	if err := validate.MaxLength("firstName", "body", string(m.FirstName), 256); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *User) validateLastName(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.LastName) { // not required
+		return nil
+	}
+
+	if err := validate.MaxLength("lastName", "body", string(m.LastName), 256); err != nil {
 		return err
 	}
 

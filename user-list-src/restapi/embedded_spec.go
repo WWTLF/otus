@@ -218,14 +218,16 @@ func init() {
           "format": "email"
         },
         "firstName": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 256
         },
         "id": {
           "type": "integer",
           "format": "int64"
         },
         "lastName": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 256
         },
         "phone": {
           "type": "string",
@@ -446,14 +448,16 @@ func init() {
           "format": "email"
         },
         "firstName": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 256
         },
         "id": {
           "type": "integer",
           "format": "int64"
         },
         "lastName": {
-          "type": "string"
+          "type": "string",
+          "maxLength": 256
         },
         "phone": {
           "type": "string",

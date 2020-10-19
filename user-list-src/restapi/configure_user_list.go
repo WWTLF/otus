@@ -10,6 +10,8 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	log "github.com/sirupsen/logrus"
+
 	"user_list/models"
 	"user_list/restapi/operations"
 	"user_list/restapi/operations/healthcheck"
@@ -30,7 +32,7 @@ func configureAPI(api *operations.UserListAPI) http.Handler {
 	// Expected interface func(string, ...interface{})
 	//
 	// Example:
-	// api.Logger = log.Printf
+	api.Logger = log.Debugf
 
 	api.UseSwaggerUI()
 	// To continue using redoc as your UI, uncomment the following line

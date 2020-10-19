@@ -1,0 +1,12 @@
+apiVersion: skaffold/v1
+kind: Config
+metadata:
+  name: microservices
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+  - image: wwtlf/user_list
+    context: user-list-src
+  - image: wwtlf/user_list_migrate
+    context: userlist-migration-src
