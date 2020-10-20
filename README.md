@@ -14,7 +14,7 @@ curl http://arch.homework/otusapp/borisershov/health
 ```
 helm repo add wwtlf https://wwtlf.github.io/userlist
 helm repo update
-helm install otus userlist -f values.yaml  
+helm install otus wwtlf/userlist -f values.yaml  
 ```
 
 Исходные коды лежат тут: https://github.com/WWTLF/userlist
