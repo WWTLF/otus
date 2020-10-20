@@ -60,8 +60,14 @@ paths:
           $ref: "#/definitions/User"
         required: true
       responses:
+        "200":
+          description: "user response"
+          schema:
+            $ref: "#/definitions/User"
         default:
-          description: "successful operation"
+          description: "unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
   /user/{userId}:
     get:
       tags:
@@ -107,9 +113,11 @@ paths:
         required: true     
       responses:
         "200":
-          description: "user updated"
+          description: "user response"
+          schema:
+            $ref: "#/definitions/User"
         default:
-          description: "unexpected error"       
+          description: "unexpected error"
           schema:
             $ref: "#/definitions/Error"
     delete:

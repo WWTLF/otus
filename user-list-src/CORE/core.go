@@ -28,14 +28,21 @@ func GetInstance() *CORE {
 // DBInit Инициализация соединения с БД
 func (core *CORE) DBInit() {
 	log.Info("DB Connection...")
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%s",
-		os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRESQL_HOSTNAME"), os.Getenv("POSTGRESQL_PORT_NUMBER"))
+	dbinfo := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRESQL_HOSTNAME"),
+		os.Getenv("POSTGRESQL_PORT_NUMBER"),
+		os.Getenv("POSTGRESQL_DB") )
 	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
 		log.Panic(err)
 	}
 	core.DB = db
 	_, err = db.Exec("select 1")
+	if err != nil {
+		log.Panic(err)
+	}
 	log.Info("Done")
 }
 

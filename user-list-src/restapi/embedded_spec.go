@@ -99,8 +99,17 @@ func init() {
           }
         ],
         "responses": {
+          "200": {
+            "description": "user response",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
           "default": {
-            "description": "successful operation"
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           }
         }
       }
@@ -167,7 +176,10 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "user updated"
+            "description": "user response",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
           },
           "default": {
             "description": "unexpected error",
@@ -353,8 +365,17 @@ func init() {
           }
         ],
         "responses": {
+          "200": {
+            "description": "user response",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
           "default": {
-            "description": "successful operation"
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           }
         }
       }
@@ -421,7 +442,10 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "user updated"
+            "description": "user response",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
           },
           "default": {
             "description": "unexpected error",

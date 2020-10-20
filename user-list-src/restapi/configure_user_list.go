@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"net/http"
 	Core "user_list/CORE"
+	"user_list/HandlersImpl/UserHandlers"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
@@ -27,21 +28,13 @@ func configureFlags(api *operations.UserListAPI) {
 
 func configureAPI(api *operations.UserListAPI) http.Handler {
 	Core.GetInstance().DBInit()
-	// configure the api here
+
 	api.ServeError = errors.ServeError
-
-	// Set your custom logger if needed. Default one is log.Printf
-	// Expected interface func(string, ...interface{})
-	//
-	// Example:
 	api.Logger = log.Debugf
-
 	api.UseSwaggerUI()
 	// To continue using redoc as your UI, uncomment the following line
 	api.UseRedoc()
-
 	api.JSONConsumer = runtime.JSONConsumer()
-
 	api.JSONProducer = runtime.JSONProducer()
 
 	api.HealthcheckHealthCheckHandler = healthcheck.HealthCheckHandlerFunc(func(params healthcheck.HealthCheckParams) middleware.Responder {
@@ -56,34 +49,16 @@ func configureAPI(api *operations.UserListAPI) http.Handler {
 		} else {
 			var code int32 = 500
 			message := "DB connection is not ready"
-			healthcheck.NewReadinessHealthCheckDefault(500).WithPayload(&models.Error{Code: &code, Message: &message})
+			return healthcheck.NewReadinessHealthCheckDefault(500).WithPayload(&models.Error{Code: &code, Message: &message})
 		}
-		return middleware.NotImplemented("operation user.CreateUser has not yet been implemented")
 	})
 
-	if api.UserCreateUserHandler == nil {
-		api.UserCreateUserHandler = user.CreateUserHandlerFunc(func(params user.CreateUserParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.CreateUser has not yet been implemented")
-		})
-	}
-	if api.UserDeleteUserHandler == nil {
-		api.UserDeleteUserHandler = user.DeleteUserHandlerFunc(func(params user.DeleteUserParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.DeleteUser has not yet been implemented")
-		})
-	}
-	// if api.UserFindUserByIDHandler == nil {
-	api.UserFindUserByIDHandler = user.FindUserByIDHandlerFunc(func(params user.FindUserByIDParams) middleware.Responder {
-		// return middleware.NotImplemented("operation user.FindUserByID has not yet been implemented3")
-		return user.NewFindUserByIDOK().WithPayload(&models.User{FirstName: "test", Email: "test@test.com", ID: params.UserID})
-	})
-	// }
-	if api.UserUpdateUserHandler == nil {
-		api.UserUpdateUserHandler = user.UpdateUserHandlerFunc(func(params user.UpdateUserParams) middleware.Responder {
-			return middleware.NotImplemented("operation user.UpdateUser has not yet been implemented")
-		})
-	}
+	api.UserCreateUserHandler = user.CreateUserHandlerFunc(UserHandlers.CreateUser)
+	api.UserDeleteUserHandler = user.DeleteUserHandlerFunc(UserHandlers.DeleteUser)
+	api.UserFindUserByIDHandler = user.FindUserByIDHandlerFunc(UserHandlers.FindUserById)
+	api.UserUpdateUserHandler = user.UpdateUserHandlerFunc(UserHandlers.UpdateUser)
 
-	api.PreServerShutdown = func() {}
+	api.PreServerShutdown = func() { Core.GetInstance().DBClose() }
 
 	api.ServerShutdown = func() {}
 

@@ -9,14 +9,65 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"user_list/models"
 )
 
-/*CreateUserDefault successful operation
+// CreateUserOKCode is the HTTP code returned for type CreateUserOK
+const CreateUserOKCode int = 200
+
+/*CreateUserOK user response
+
+swagger:response createUserOK
+*/
+type CreateUserOK struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.User `json:"body,omitempty"`
+}
+
+// NewCreateUserOK creates CreateUserOK with default headers values
+func NewCreateUserOK() *CreateUserOK {
+
+	return &CreateUserOK{}
+}
+
+// WithPayload adds the payload to the create user o k response
+func (o *CreateUserOK) WithPayload(payload *models.User) *CreateUserOK {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the create user o k response
+func (o *CreateUserOK) SetPayload(payload *models.User) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *CreateUserOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(200)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
+}
+
+/*CreateUserDefault unexpected error
 
 swagger:response createUserDefault
 */
 type CreateUserDefault struct {
 	_statusCode int
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewCreateUserDefault creates CreateUserDefault with default headers values
@@ -41,10 +92,25 @@ func (o *CreateUserDefault) SetStatusCode(code int) {
 	o._statusCode = code
 }
 
+// WithPayload adds the payload to the create user default response
+func (o *CreateUserDefault) WithPayload(payload *models.Error) *CreateUserDefault {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the create user default response
+func (o *CreateUserDefault) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *CreateUserDefault) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(o._statusCode)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
