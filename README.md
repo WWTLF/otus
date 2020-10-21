@@ -27,3 +27,4 @@ helm install otus wwtlf/userlist -f values.yaml
 - https://flagger.app/ - feature toggling
 - https://medium.com/hackernoon/wrong-ways-of-defining-service-boundaries-d9e313007bcc - decomposition
 - https://skaffold.dev/docs/install/ - CI/CD инструмент
+- https://kubernetes.github.io/ingress-nginx/examples/affinity/cookie/ - Настройка sticky маршрутизации
