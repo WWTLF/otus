@@ -58,9 +58,14 @@ func configureAPI(api *operations.UserListAPI) http.Handler {
 	api.UserFindUserByIDHandler = user.FindUserByIDHandlerFunc(UserHandlers.FindUserById)
 	api.UserUpdateUserHandler = user.UpdateUserHandlerFunc(UserHandlers.UpdateUser)
 
-	api.PreServerShutdown = func() { Core.GetInstance().DBClose() }
+	api.PreServerShutdown = func() {
+		log.Info("Shutting down...")
+		Core.GetInstance().DBClose()
+	}
 
-	api.ServerShutdown = func() {}
+	api.ServerShutdown = func() {
+		log.Info("Shutting down...Done")
+	}
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
 }
