@@ -14,10 +14,10 @@ curl http://arch.homework/otusapp/borisershov/health
 ```
 helm repo add wwtlf https://wwtlf.github.io/userlist
 helm repo update
-helm install otus userlist -f values.yaml  
+helm install otus wwtlf/userlist -f values.yaml  
 ```
 
-Исходные коды лежат тут: https://github.com/WWTLF/userlist
+Исходные коды chart лежат тут: https://github.com/WWTLF/userlist
 
 Для тестирования есть коллекция: https://www.getpostman.com/collections/387963098dd12e6e7fd0
 
@@ -27,3 +27,4 @@ helm install otus userlist -f values.yaml
 - https://flagger.app/ - feature toggling
 - https://medium.com/hackernoon/wrong-ways-of-defining-service-boundaries-d9e313007bcc - decomposition
 - https://skaffold.dev/docs/install/ - CI/CD инструмент
+- https://kubernetes.github.io/ingress-nginx/examples/affinity/cookie/ - Настройка sticky маршрутизации
