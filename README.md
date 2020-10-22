@@ -16,7 +16,7 @@ helm repo update
 helm install otus wwtlf/userlist -f values.yaml  
 ```
 
-Для тестирования в данной папке есть коллекция POSTMAN:
+Для тестирования в папке https://github.com/WWTLF/otus/edit/master/otus1.6/ есть коллекция POSTMAN:
 ```
 newman run otusapp-borisershov.postman_collection.json
 ```
