@@ -41,7 +41,9 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 ```
 
 Демонстрация, что метрики отдаются:
+
 ![counter](https://github.com/WWTLF/otus/blob/master/otus1.8/counter.png)
+
 ![latency](https://github.com/WWTLF/otus/blob/master/otus1.8/Hist.png)
 
 
