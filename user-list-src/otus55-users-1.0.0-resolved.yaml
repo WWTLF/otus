@@ -10,6 +10,19 @@ tags:
 - name: "user"
   description: "Operations about user"
 paths:
+  /metrics:
+    get:
+      tags:
+        - instruments
+      summary: "Prometheus metrics"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: ok
+          schema:
+            $ref: "#/definitions/Any"
+
   /health/liveness:
     get:
       tags:
@@ -179,4 +192,7 @@ definitions:
     properties:      
       status:
         type: "string"
+  Any:
+    type: "object"
+
   

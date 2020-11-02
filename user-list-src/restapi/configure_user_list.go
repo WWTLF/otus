@@ -4,7 +4,10 @@ package restapi
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
+	"strings"
+	"time"
 	Core "user_list/CORE"
 	"user_list/HandlersImpl/UserHandlers"
 
@@ -17,13 +20,52 @@ import (
 	"user_list/models"
 	"user_list/restapi/operations"
 	"user_list/restapi/operations/healthcheck"
+	"user_list/restapi/operations/instruments"
 	"user_list/restapi/operations/user"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 //go:generate swagger generate server --target ../../otus1 --name UserList --spec ../otus55-users-1.0.0-resolved.yaml --principal interface{}
+var (
+	metrics_rq_latancy = promauto.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name: "app_request_latency_seconds",
+			Help: "Application Request Latency",
+		},
+		[]string{"method", "endpoint"},
+	)
+
+	metrics_rq_counter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "app_request_count",
+		Help: "Application Request Count",
+	}, []string{"method", "endpoint", "http_status"})
+)
+
+type CustomResponder func(http.ResponseWriter, runtime.Producer)
+
+func (c CustomResponder) WriteResponse(w http.ResponseWriter, p runtime.Producer) {
+	c(w, p)
+}
+
+func NewCustomResponder(r *http.Request, h http.Handler) middleware.Responder {
+	return CustomResponder(func(w http.ResponseWriter, _ runtime.Producer) {
+		h.ServeHTTP(w, r)
+	})
+}
 
 func configureFlags(api *operations.UserListAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
+	// log.SetFormatter(&log.JSONFormatter{})
+
+	// Output to stdout instead of the default stderr
+	// Can be any io.Writer, see below for File example
+
+	// Only log the warning severity or above.
+	log.SetLevel(log.DebugLevel)
+	prometheus.MustRegister(prometheus.NewBuildInfoCollector())
 }
 
 func configureAPI(api *operations.UserListAPI) http.Handler {
@@ -58,6 +100,11 @@ func configureAPI(api *operations.UserListAPI) http.Handler {
 	api.UserFindUserByIDHandler = user.FindUserByIDHandlerFunc(UserHandlers.FindUserById)
 	api.UserUpdateUserHandler = user.UpdateUserHandlerFunc(UserHandlers.UpdateUser)
 
+	api.InstrumentsGetMetricsHandler = instruments.GetMetricsHandlerFunc(func(p instruments.GetMetricsParams) middleware.Responder {
+		// some logic here
+		return NewCustomResponder(p.HTTPRequest, promhttp.Handler())
+	})
+
 	api.PreServerShutdown = func() {
 		log.Info("Shutting down...")
 		Core.GetInstance().DBClose()
@@ -88,8 +135,45 @@ func setupMiddlewares(handler http.Handler) http.Handler {
 	return handler
 }
 
+// LoggingResponseWriter is a wrapper around an http.ResponseWriter which captures the
+// status code written to the response, so that it can be logged.
+type LoggingResponseWriter struct {
+	wrapped    http.ResponseWriter
+	StatusCode int
+	// Response content could also be captured here, but I was only interested in logging the response status code
+}
+
+func NewLoggingResponseWriter(wrapped http.ResponseWriter) *LoggingResponseWriter {
+	return &LoggingResponseWriter{wrapped: wrapped}
+}
+
+func (lrw *LoggingResponseWriter) Header() http.Header {
+	return lrw.wrapped.Header()
+}
+
+func (lrw *LoggingResponseWriter) Write(content []byte) (int, error) {
+	return lrw.wrapped.Write(content)
+}
+
+func (lrw *LoggingResponseWriter) WriteHeader(statusCode int) {
+	lrw.StatusCode = statusCode
+	lrw.wrapped.WriteHeader(statusCode)
+}
+
 // The middleware configuration happens before anything, this middleware also applies to serving the swagger.json document.
 // So this is a good place to plug in a panic handling middleware, logging and metrics
 func setupGlobalMiddleware(handler http.Handler) http.Handler {
-	return handler
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		endpoint := r.URL.Path
+		if strings.Contains(endpoint, "/user/") {
+			endpoint = "/user"
+		}
+		t0 := time.Now().UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond))
+		w2 := NewLoggingResponseWriter(w)
+		handler.ServeHTTP(w2, r)
+		total := time.Now().UnixNano()/(int64(time.Millisecond)/int64(time.Nanosecond)) - t0
+		metrics_rq_counter.With(prometheus.Labels{"method": r.Method, "endpoint": endpoint, "http_status": fmt.Sprintf("%d", w2.StatusCode)}).Inc()
+		metrics_rq_latancy.With(prometheus.Labels{"method": r.Method, "endpoint": endpoint}).Observe(float64(total))
+	})
 }

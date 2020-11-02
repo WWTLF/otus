@@ -20,6 +20,7 @@ import (
 	"github.com/go-openapi/swag"
 
 	"user_list/restapi/operations/healthcheck"
+	"user_list/restapi/operations/instruments"
 	"user_list/restapi/operations/user"
 )
 
@@ -45,6 +46,9 @@ func NewUserListAPI(spec *loads.Document) *UserListAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		InstrumentsGetMetricsHandler: instruments.GetMetricsHandlerFunc(func(params instruments.GetMetricsParams) middleware.Responder {
+			return middleware.NotImplemented("operation instruments.GetMetrics has not yet been implemented")
+		}),
 		UserCreateUserHandler: user.CreateUserHandlerFunc(func(params user.CreateUserParams) middleware.Responder {
 			return middleware.NotImplemented("operation user.CreateUser has not yet been implemented")
 		}),
@@ -98,6 +102,8 @@ type UserListAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// InstrumentsGetMetricsHandler sets the operation handler for the get metrics operation
+	InstrumentsGetMetricsHandler instruments.GetMetricsHandler
 	// UserCreateUserHandler sets the operation handler for the create user operation
 	UserCreateUserHandler user.CreateUserHandler
 	// UserDeleteUserHandler sets the operation handler for the delete user operation
@@ -186,6 +192,9 @@ func (o *UserListAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.InstrumentsGetMetricsHandler == nil {
+		unregistered = append(unregistered, "instruments.GetMetricsHandler")
+	}
 	if o.UserCreateUserHandler == nil {
 		unregistered = append(unregistered, "user.CreateUserHandler")
 	}
@@ -292,6 +301,10 @@ func (o *UserListAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/metrics"] = instruments.NewGetMetrics(o.context, o.InstrumentsGetMetricsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

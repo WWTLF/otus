@@ -76,6 +76,25 @@ func init() {
         }
       }
     },
+    "/metrics": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "instruments"
+        ],
+        "summary": "Prometheus metrics",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/Any"
+            }
+          }
+        }
+      }
+    },
     "/user": {
       "post": {
         "description": "This can only be done by the logged in user.",
@@ -220,6 +239,9 @@ func init() {
     }
   },
   "definitions": {
+    "Any": {
+      "type": "object"
+    },
     "Error": {
       "type": "object",
       "required": [
@@ -342,6 +364,25 @@ func init() {
         }
       }
     },
+    "/metrics": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "instruments"
+        ],
+        "summary": "Prometheus metrics",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "schema": {
+              "$ref": "#/definitions/Any"
+            }
+          }
+        }
+      }
+    },
     "/user": {
       "post": {
         "description": "This can only be done by the logged in user.",
@@ -486,6 +527,9 @@ func init() {
     }
   },
   "definitions": {
+    "Any": {
+      "type": "object"
+    },
     "Error": {
       "type": "object",
       "required": [
