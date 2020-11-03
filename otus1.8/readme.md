@@ -79,20 +79,20 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
   - [x] 2. Потребление подами приолжения CPU
 ![mem](https://github.com/WWTLF/otus/blob/master/otus1.8/mem.png)
 
-Релизовано с помощью готового DASHBOARD: https://grafana.com/grafana/dashboards/11074 
+Релизовано с помощью встроенного дашборда: kubernetes-compute-resources-pod
 
   
 
 ### Инструментировать базу данных с помощью экспортера для prometheus для этой БД.
 - [x] Добавить в общий дашборд графики с метриками работы БД.
-  - Ативируем сбор метрик в настройках зависимостей чарта: https://github.com/WWTLF/userlist/blob/master/Chart.yaml
+  - Ативируем сбор метрик в настройках values чарта: https://github.com/WWTLF/userlist/blob/master/values.yaml
 ```
-dependencies:
-    - name: postgresql
-      version: 9.8.3
-      repository: https://charts.bitnami.com/bitnami
-      alias: pg
-      metrics:
-        serviceMonitor:
-          enabled: true
+pg:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 ```
+ - Настраиваем еще один дашборд в графане: https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-pg-configmap.yaml
+ 
+ ![pg](https://github.com/WWTLF/otus/blob/master/otus1.8/pg.png)
