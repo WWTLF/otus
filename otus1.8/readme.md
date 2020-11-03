@@ -48,14 +48,18 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
 
 ## Сделать дашборд в Графане, в котором были бы метрики с разбивкой по API методам:
-  - [ ] 1. Latency (response time) с квантилями по 0.5, 0.95, 0.99, max
-  - [ ] 2. RPS
-  - [ ] 3. Error Rate - количество 500ых ответов
+  - [x] 1. Latency (response time) с квантилями по 0.5, 0.95, 0.99, max
+  - [x] 2. RPS
+  - [x] 3. Error Rate - количество 500ых ответов
+  
+ ![main](https://github.com/WWTLF/otus/blob/master/otus1.8/main_dash_board.png)
 
 ## Добавить в дашборд графики с метрикам в целом по сервису, взятые с nginx-ingress-controller:
-  - [ ] 1. Latency (response time) с квантилями по 0.5, 0.95, 0.99, max
-  - [ ] 2. RPS
-  - [ ] 3. Error Rate - количество 500ых ответов
+  - [x] 1. Latency (response time) с квантилями по 0.5, 0.95, 0.99, max
+  - [x] 2. RPS
+  - [x] 3. Error Rate - количество 500ых ответов
+  
+  
 
 ## Настроить алертинг в графане на Error Rate и Latency.
 
