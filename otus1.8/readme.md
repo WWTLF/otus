@@ -58,13 +58,16 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
   - [x] 1. Latency (response time) с квантилями по 0.5, 0.95, 0.99, max
   - [x] 2. RPS
   - [x] 3. Error Rate - количество 500ых ответов
-  
-  
 
+Скриншоты с алертингом ниже.
+  
 ## Настроить алертинг в графане на Error Rate и Latency.
 
 - На выходе должно быть:
- - [ ] 0) скриншоты дашборды с графиками в момент стресс-тестирования сервиса. Например, после 5-10 минут нагрузки.
+ - [x] 0) скриншоты дашборды с графиками в момент стресс-тестирования сервиса. Например, после 5-10 минут нагрузки.
+ 
+![nginx](https://github.com/WWTLF/otus/blob/master/otus1.8/NGINX_dash_board.png)
+ 
  - [x] 1) json-дашборды: https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-configmap.yaml 	
    - Для сервиса https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-configmap.yaml 
    - Для INGRESS https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-nginx-configmap.yaml 
