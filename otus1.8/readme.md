@@ -73,7 +73,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
    - Для INGRESS https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-nginx-configmap.yaml 
 
 ## Задание со звездочкой (+5 баллов)
-- [x] Используя существующие системные метрики из кубернетеса, добавить на дашборд графики с метриками:
+### Используя существующие системные метрики из кубернетеса, добавить на дашборд графики с метриками:
   - [x] 1. Потребление подами приложения памяти
 ![cpu](https://github.com/WWTLF/otus/blob/master/otus1.8/cpu.png)
   - [x] 2. Потребление подами приолжения CPU
@@ -83,5 +83,16 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
   
 
-## Инструментировать базу данных с помощью экспортера для prometheus для этой БД.
-- [ ] Добавить в общий дашборд графики с метриками работы БД.
+### Инструментировать базу данных с помощью экспортера для prometheus для этой БД.
+- [x] Добавить в общий дашборд графики с метриками работы БД.
+  - Ативируем сбор метрик в настройках зависимостей чарта: https://github.com/WWTLF/userlist/blob/master/Chart.yaml
+```
+dependencies:
+    - name: postgresql
+      version: 9.8.3
+      repository: https://charts.bitnami.com/bitnami
+      alias: pg
+      metrics:
+        serviceMonitor:
+          enabled: true
+```
