@@ -58,19 +58,22 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
   - [x] 1. Latency (response time) с квантилями по 0.5, 0.95, 0.99, max
   - [x] 2. RPS
   - [x] 3. Error Rate - количество 500ых ответов
-  
-  
 
+Скриншоты с алертингом ниже.
+  
 ## Настроить алертинг в графане на Error Rate и Latency.
 
 - На выходе должно быть:
- - [ ] 0) скриншоты дашборды с графиками в момент стресс-тестирования сервиса. Например, после 5-10 минут нагрузки.
- - [x] 1) json-дашборды: https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-configmap.yaml 	
+ - [x] 0) скриншоты дашборды с графиками в момент стресс-тестирования сервиса. Например, после 5-10 минут нагрузки.
+ 
+![nginx](https://github.com/WWTLF/otus/blob/master/otus1.8/NGINX_dash_board.png)
+ 
+ - [x] 1) json-дашборды:
    - Для сервиса https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-configmap.yaml 
    - Для INGRESS https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-nginx-configmap.yaml 
 
 ## Задание со звездочкой (+5 баллов)
-- [x] Используя существующие системные метрики из кубернетеса, добавить на дашборд графики с метриками:
+### Используя существующие системные метрики из кубернетеса, добавить на дашборд графики с метриками:
   - [x] 1. Потребление подами приложения памяти
 ![cpu](https://github.com/WWTLF/otus/blob/master/otus1.8/cpu.png)
   - [x] 2. Потребление подами приолжения CPU
@@ -80,5 +83,16 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 
   
 
-## Инструментировать базу данных с помощью экспортера для prometheus для этой БД.
-- [ ] Добавить в общий дашборд графики с метриками работы БД.
+### Инструментировать базу данных с помощью экспортера для prometheus для этой БД.
+- [x] Добавить в общий дашборд графики с метриками работы БД.
+  - Ативируем сбор метрик в настройках зависимостей чарта: https://github.com/WWTLF/userlist/blob/master/Chart.yaml
+```
+dependencies:
+    - name: postgresql
+      version: 9.8.3
+      repository: https://charts.bitnami.com/bitnami
+      alias: pg
+      metrics:
+        serviceMonitor:
+          enabled: true
+```
