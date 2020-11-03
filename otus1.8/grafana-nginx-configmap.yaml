@@ -5,7 +5,7 @@ metadata:
   labels:
     grafana-dashboard: "1"
 data:
-  main-dashboard.json: |
+  nginx-dashboard.json: |
     {
       "annotations": {
         "list": [
@@ -23,7 +23,7 @@ data:
       "editable": true,
       "gnetId": null,
       "graphTooltip": 0,
-      "id": 27,
+      "id": 28,
       "links": [],
       "panels": [
         {
@@ -75,9 +75,9 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.5, \n      sum by (le, exported_endpoint) \n         (rate(app_request_latency_seconds_bucket{exported_endpoint!=\"/metrics\"}[1m]))\n) * 1000\n",
+              "expr": "histogram_quantile(0.5, \n      sum by (le, path) \n         (rate(nginx_ingress_controller_response_duration_seconds_bucket{path=\"/otusapp/borisershov/api/v1(/|$)(.*)\"}[1m]))\n) * 1000\n",
               "interval": "",
-              "legendFormat": "{{exported_endpoint}}",
+              "legendFormat": "{{path}}",
               "refId": "A"
             }
           ],
@@ -170,9 +170,9 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.95, \n      sum by (le, exported_endpoint) \n         (rate(app_request_latency_seconds_bucket{exported_endpoint!=\"/metrics\"}[1m]))\n) * 1000\n",
+              "expr": "histogram_quantile(0.95, \n      sum by (le, path) \n         (rate(nginx_ingress_controller_response_duration_seconds_bucket{path=\"/otusapp/borisershov/api/v1(/|$)(.*)\"}[1m]))\n) * 1000\n",
               "interval": "",
-              "legendFormat": "{{exported_endpoint}}",
+              "legendFormat": "{{path}}",
               "refId": "A"
             }
           ],
@@ -265,9 +265,9 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.99, \n      sum by (le, exported_endpoint) \n         (rate(app_request_latency_seconds_bucket{exported_endpoint!=\"/metrics\"}[1m]))\n) * 1000",
+              "expr": "histogram_quantile(0.99, \n      sum by (le, path) \n         (rate(nginx_ingress_controller_response_duration_seconds_bucket{path=\"/otusapp/borisershov/api/v1(/|$)(.*)\"}[1m]))\n) * 1000",
               "interval": "",
-              "legendFormat": "{{exported_endpoint}}",
+              "legendFormat": "{{path}}",
               "refId": "A"
             }
           ],
@@ -360,9 +360,9 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(1, \n      sum by (le, exported_endpoint) \n         (rate(app_request_latency_seconds_bucket{exported_endpoint!=\"/metrics\"}[1m]))\n) * 1000",
+              "expr": "histogram_quantile(1, \n      sum by (le, path) \n         (rate(nginx_ingress_controller_response_duration_seconds_bucket{path=\"/otusapp/borisershov/api/v1(/|$)(.*)\"}[1m]))\n) * 1000",
               "interval": "",
-              "legendFormat": "{{exported_endpoint}}",
+              "legendFormat": "{{path}}",
               "refId": "A"
             }
           ],
@@ -455,9 +455,9 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum by (exported_endpoint) (rate(app_request_count{exported_endpoint!=\"/metrics\"}[1m]))",
+              "expr": "sum by (path) (rate(nginx_ingress_controller_request_duration_seconds_count[1m]))",
               "interval": "",
-              "legendFormat": "RPS {{exported_endpoint}}",
+              "legendFormat": "RPS {{path}}",
               "refId": "A"
             }
           ],
@@ -503,9 +503,7 @@ data:
           }
         },
         {
-          "aliasColors": {
-            "/user": "red"
-          },
+          "aliasColors": {},
           "bars": false,
           "dashLength": 10,
           "dashes": false,
@@ -552,9 +550,9 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum by (exported_endpoint) (rate(app_request_count{exported_endpoint!=\"/metrics\",http_status=~\"5.+\"}[1m]))",
+              "expr": "sum by (status) (increase(nginx_ingress_controller_request_duration_seconds_count{status=~\"5.+\"}[1m]))",
               "interval": "",
-              "legendFormat": "{{exported_endpoint}}",
+              "legendFormat": "{{status}}",
               "refId": "A"
             }
           ],
@@ -613,7 +611,7 @@ data:
       },
       "timepicker": {},
       "timezone": "",
-      "title": "Main Dashboard",
-      "uid": "lpzjkIhMz",
-      "version": 16
+      "title": "NGINX Dashboard",
+      "uid": "klFPZvhMz",
+      "version": 7
     }

@@ -174,6 +174,6 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
 		handler.ServeHTTP(w2, r)
 		total := time.Now().UnixNano()/(int64(time.Millisecond)/int64(time.Nanosecond)) - t0
 		metrics_rq_counter.With(prometheus.Labels{"method": r.Method, "endpoint": endpoint, "http_status": fmt.Sprintf("%d", w2.StatusCode)}).Inc()
-		metrics_rq_latancy.With(prometheus.Labels{"method": r.Method, "endpoint": endpoint}).Observe(float64(total))
+		metrics_rq_latancy.With(prometheus.Labels{"method": r.Method, "endpoint": endpoint}).Observe(float64(total / 1000))
 	})
 }
