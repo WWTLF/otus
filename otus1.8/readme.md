@@ -68,7 +68,7 @@ func setupGlobalMiddleware(handler http.Handler) http.Handler {
  
 ![nginx](https://github.com/WWTLF/otus/blob/master/otus1.8/NGINX_dash_board.png)
  
- - [x] 1) json-дашборды: https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-configmap.yaml 	
+ - [x] 1) json-дашборды:
    - Для сервиса https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-configmap.yaml 
    - Для INGRESS https://github.com/WWTLF/otus/blob/master/otus1.8/grafana-nginx-configmap.yaml 
 
