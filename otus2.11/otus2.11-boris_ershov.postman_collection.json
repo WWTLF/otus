@@ -1,0 +1,164 @@
+{
+	"info": {
+		"_postman_id": "b2da1a4f-1058-4184-86c1-2f4fd0dd0af1",
+		"name": "otus2.11/boris_ershov",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "STEP 2.  Get Access Token for User 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "78774ed0-35ac-49cd-a13d-4db372e1bfaa",
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set('access_token', responseJSON['access_token'])",
+							"pm.test(\"Получение access_token\", ()=>{",
+							"    pm.expect(pm.response.text()).to.include(\"access_token\");    ",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "frontend",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "31fc5171-4500-4050-863b-2dba1b793e28",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "openid profile email",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "user1",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BaseURL}}/auth/realms/portfolio/protocol/openid-connect/token",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"auth",
+						"realms",
+						"portfolio",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP 3. TEST login to BackEnd",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "78396353-796e-4b7c-8040-c99c2f74bda5",
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"",
+							"pm.test(\"Пользователь User1 успешно авторизован по токену\", ()=>{",
+							"    pm.expect(responseJSON['email']).to.eql(\"user1@mail.ru\");",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"followRedirects": false
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{access_token}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/profile/api/v1/login",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"profile",
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"id": "6ea12af6-762f-4a6e-bbcb-d70b8f87a1f1",
+			"key": "BaseURL",
+			"value": "http://arch.homework"
+		},
+		{
+			"id": "1c24a180-3f5a-4f62-b41b-22970acf9335",
+			"key": "access_token",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}
