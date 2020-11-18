@@ -9,33 +9,20 @@ curl http://arch.homework/otusapp/borisershov/health
 ```
 
 ## Задание 1.6. Основы работы с Kubernetes (часть 3)
-Для установки:
-```
-helm repo add wwtlf https://wwtlf.github.io/userlist
-helm repo update
-helm install otus wwtlf/userlist -f values.yaml  
-```
 
-Для тестирования в данной папке есть коллекция POSTMAN:
-```
-newman run otusapp-borisershov.postman_collection.json
-```
+https://github.com/WWTLF/otus/blob/master/otus1.6/readme.md
 
-Исходные коды chart лежат тут: https://github.com/WWTLF/userlist
+## Задание 1.8. Prometheus. Grafana
 
-### Краткое описание
+https://github.com/WWTLF/otus/blob/master/otus1.8/readme.md
 
-- [x] PostgreSQL подключен как зависимость
-- [x] Геренрируется 2 Job'а:
-  - create-user-job -  создает нового пользователя Postgres с ограниченными правами
-  - userlist-migrate Производит миграцию данных с помощью инстурмента https://github.com/golang-migrate/migrate, исходный код контейнера миграции тут: https://github.com/WWTLF/otus/tree/master/userlist-migration-src
-- [x] Главный сервис userlist https://github.com/WWTLF/otus/tree/master/user-list-src
-- [x] Пароли лежат в secrets
-- [x] Точка монтирования PV на хосте определяется настройками БД по умолчанию: /tmp/hostpath-provisioner
-  - Есть возможность указать свой PVC в файле volumes в разделе pg
-- [x] Настроена liveness проба
-- [x] Настроена readiness проба, которая проверяет доступность БД
-- [x] Реализован gracefull shutdown, который безопасно завершает соединение с БД
+## Задание 1.9 Service mesh на примере Istio
+
+https://github.com/WWTLF/otus/blob/master/otus1.9/README.md
+
+## Задание 2.11 Backend for frontends. Apigateway
+
+https://github.com/WWTLF/otus/blob/master/otus2.11/readme.md
 
 # Полезные ссылки
 - https://12factor.net/ -  best practices
