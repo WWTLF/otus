@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+  namespace: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        k8s-app: oauth2-proxy
+    spec:
+      containers:
+      - args:
+        - --email-domain=*
+        - --provider=keycloak        
+        - --auth-logging=true
+        - --http-address=0.0.0.0:4180        
+        - --pass-authorization-header=true
+        - --pass-access-token=true
+        - --set-authorization-header=true
+        - --set-xauthrequest=true        
+        - --errors-to-info-log=true
+        - --request-logging=true
+        - --standard-logging=true
+        - --scope=openid profile email
+        - --prompt=       
+        - --skip-auth-preflight=true
+        - --skip-jwt-bearer-tokens
+        - --extra-jwt-issuers=http://keycloak-http.auth.svc.cluster.local/auth/realms/portfolio=frontend        
+        # - --insecure-oidc-skip-issuer-verification=true
+        # - --oidc-issuer-url=http://arch.homework/auth/realms/portfolio
+        # - --skip-oidc-discovery=true
+        # - --oidc-jwks-url=http://keycloak-http.auth.svc.cluster.local/auth/realms/portfolio/protocol/openid-connect/certs
+        # - --cookie-domain=portfolio.local localhost  
+        # - --cookie-samesite=strict     
+        
+        env:
+        - name: OAUTH2_PROXY_CLIENT_ID
+          value: frontend
+        - name: OAUTH2_PROXY_CLIENT_SECRET
+          value: 31fc5171-4500-4050-863b-2dba1b793e28
+        - name: OAUTH2_PROXY_COOKIE_SECRET
+          value: 2YnU7OoWUCCqkKZ3_8H0iA==
+        - name: OAUTH2_PROXY_LOGIN_URL
+          value: http://arch.homework/auth/realms/portfolio/protocol/openid-connect/auth
+        - name: OAUTH2_PROXY_REDEEM_URL  
+          value: http://keycloak-http.auth.svc.cluster.local/auth/realms/portfolio/protocol/openid-connect/token        
+        - name: OAUTH2_PROXY_VALIDATE_URL  
+          value: http://keycloak-http.auth.svc.cluster.local/auth/realms/portfolio/protocol/openid-connect/userinfo
+        - name: OAUTH2_PROXY_REDIRECT_URL  
+          value: http://arch.homework/oauth2/callback
+        - name: OAUTH2_PROXY_COOKIE_SECURE
+          value: "false"
+        image: wwtlf/oauth2-proxy
+        imagePullPolicy: Never
+        name: oauth2-proxy
+        ports:
+        - containerPort: 4180
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+  namespace: auth
+spec:
+  ports:
+  - name: http
+    port: 4180
+    protocol: TCP
+    targetPort: 4180
+  selector:
+    k8s-app: oauth2-proxy
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oauth2-proxy
+  namespace: auth
+spec:
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: oauth2-proxy
+                port:
+                  number: 4180

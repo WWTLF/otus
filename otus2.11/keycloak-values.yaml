@@ -1,0 +1,44 @@
+postgresql:
+  # Disable PostgreSQL dependency
+  enabled: false
+
+extraEnv: |
+  - name: DB_VENDOR
+    value: postgres
+  - name: DB_ADDR
+    value: otus-pg.default.svc.cluster.local
+  - name: DB_PORT
+    value: "5432"
+  - name: DB_DATABASE
+    value: keycloak
+  - name: PROXY_ADDRESS_FORWARDING
+    value: "true"
+  - name: KEYCLOAK_LOGLEVEL
+    value: "ERROR"
+  - name: ROOT_LOGLEVEL
+    value: "ERROR"
+  - name: KEYCLOAK_FRONTEND_URL
+    value: "http://arch.homework/auth"
+
+extraEnvFrom: |
+  - secretRef:
+      name: '{{ include "keycloak.fullname" . }}-db'
+
+secrets:
+  db:
+    stringData:
+      DB_USER: 'keycloak'
+      DB_PASSWORD: 'wHSzWWrPG7nUC'
+
+ingress:
+  enabled: true
+  annotations: 
+    # nginx.ingress.kubernetes.io/rewrite-target: /    
+  rules:
+    - host: arch.homework
+      paths: [/auth]
+  tls: []
+
+# export POD_NAME=$(kubectl get pods --namespace auth -l "app.kubernetes.io/name=keycloak,app.kubernetes.io/instance=keycloak" -o name)
+# echo "Visit http://127.0.0.1:8080 to use your application"
+# kubectl --namespace auth port-forward "$POD_NAME" 8080
