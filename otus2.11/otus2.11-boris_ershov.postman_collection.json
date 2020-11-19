@@ -6,7 +6,158 @@
 	},
 	"item": [
 		{
-			"name": "STEP 2.  Get Access Token for User 1",
+			"name": "STEP 0.  Get Access Token for Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c9e37659-9b22-42e5-b6f7-ecc892295f8b",
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set('admin_access_token', responseJSON['access_token'])",
+							"var user1 = \"user\" + _.random(50, 10000)",
+							"pm.collectionVariables.set('User1', user1)",
+							"pm.collectionVariables.set('Password1', _.random(50, 10000))",
+							"",
+							"var user2 = \"user\" + _.random(50, 10000)",
+							"pm.collectionVariables.set('User2', user2)",
+							"pm.collectionVariables.set('Password2', _.random(50, 10000))",
+							"",
+							"pm.test(\"Получение access_token администоратора\", ()=>{",
+							"    pm.expect(pm.response.text()).to.include(\"access_token\");    ",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "admin-cli",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "Admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{BaseURL}}/auth/realms/master/protocol/openid-connect/token",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"auth",
+						"realms",
+						"master",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 1.  Регистрация первого пользователя в keycloak",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\":\"{{User1}}\",\n    \"lastName\":\"{{User1}}\", \n    \"email\":\"{{User1}}@test.com\", \n    \"enabled\":\"true\", \n    \"username\":\"{{User1}}\", \n    \"emailVerified\":\"true\",\n    \"credentials\":[{\"type\":\"password\",\"value\":\"{{Password1}}\",\"temporary\":false}]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/auth/admin/realms/portfolio/users",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"auth",
+						"admin",
+						"realms",
+						"portfolio",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 2.  Регистрация второго пользователя в keycloak",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"firstName\":\"{{User2}}\",\n    \"lastName\":\"{{User2}}\", \n    \"email\":\"{{User2}}@test.com\", \n    \"enabled\":\"true\", \n    \"username\":\"{{User2}}\", \n    \"emailVerified\":\"true\",\n    \"credentials\":[{\"type\":\"password\",\"value\":\"{{Password2}}\",\"temporary\":false}]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/auth/admin/realms/portfolio/users",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"auth",
+						"admin",
+						"realms",
+						"portfolio",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP 3.  Получение токена по паролю для первого пользователя (implicit flow)",
 			"event": [
 				{
 					"listen": "test",
@@ -51,12 +202,12 @@
 						},
 						{
 							"key": "username",
-							"value": "user1",
+							"value": "{{User1}}",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "123",
+							"value": "{{Password1}}",
 							"type": "text"
 						}
 					]
@@ -79,7 +230,7 @@
 			"response": []
 		},
 		{
-			"name": "STEP 3. TEST login to BackEnd",
+			"name": "STEP 4. Проверка авторизации по токену для пользователя 1 в главном приложении",
 			"event": [
 				{
 					"listen": "test",
@@ -87,9 +238,9 @@
 						"id": "78396353-796e-4b7c-8040-c99c2f74bda5",
 						"exec": [
 							"var responseJSON = JSON.parse(responseBody)",
-							"",
-							"pm.test(\"Пользователь User1 успешно авторизован по токену\", ()=>{",
-							"    pm.expect(responseJSON['email']).to.eql(\"user1@mail.ru\");",
+							"user1 = pm.collectionVariables.get(\"User1\")",
+							"pm.test(\"Пользователь \" + user1 + \" успешно авторизован по токену\", ()=>{",
+							"    pm.expect(responseJSON['email']).to.eql(user1 + \"@test.com\");",
 							"})"
 						],
 						"type": "text/javascript"
@@ -146,17 +297,81 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Step 5. Создание пустового инвестиционного портфеля для пользователя 1",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"RRR\": \"OPTIMAL\",\n\"amount\": 0,\n\"autoFlag\": false,\n\"broker\": \"string\",\n\"name\": \"{{User1}}p\",\n\"period\": 0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/profile/api/v1/portfolios",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"profile",
+						"api",
+						"v1",
+						"portfolios"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
 		{
-			"id": "6ea12af6-762f-4a6e-bbcb-d70b8f87a1f1",
+			"id": "4a549f0e-a90b-4e64-ba28-6ea2da017d15",
 			"key": "BaseURL",
 			"value": "http://arch.homework"
 		},
 		{
-			"id": "1c24a180-3f5a-4f62-b41b-22970acf9335",
+			"id": "af822eb1-dbd0-4029-b3f0-1fc7ddb154ab",
 			"key": "access_token",
+			"value": ""
+		},
+		{
+			"id": "c4aa2f2d-1c1e-4e87-b972-908a9f62462a",
+			"key": "admin_access_token",
+			"value": ""
+		},
+		{
+			"id": "e402b83e-ab85-46a9-b4f8-bcd4e8846010",
+			"key": "Password1",
+			"value": ""
+		},
+		{
+			"id": "0a340a40-16fc-42d6-ae79-ebe86cbf4c58",
+			"key": "Password2",
+			"value": ""
+		},
+		{
+			"id": "2313b830-731e-4438-b3bd-904ed13413be",
+			"key": "User1",
+			"value": ""
+		},
+		{
+			"id": "4404e6f7-3248-41fa-8f59-1bba80d8b251",
+			"key": "User2",
 			"value": ""
 		}
 	],
