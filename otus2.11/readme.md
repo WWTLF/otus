@@ -2,6 +2,16 @@
 
 ## Архитектура
 
+![DD](images/portfolio.png)
+
+| № | Серивис | № | Интерфейс | Описание интерфейса |
+|---|---------|---|-----------|---------------------|
+|1|ingress(NGINX)|1.1-1.4|CRUD работы с портфелями|Внешний API работы с портфелями клиента|
+|2|Keycloak|2.1|POST /auth/realms/master/protocol/openid-connect/token|REST API Получение токена пользователя keycloak (implicit flow)|
+|2|Keycloak|2.2|POST /auth/admin/realms/portfolio/users|REST API регистрации нового пользователя|
+|2|Keycloak|2.3|GET /auth/realms/portfolio|Сервис получения конфигурации  OpenID Connet клиента|
+|3|oauth2_proxy|3.1|GET /oauth2/auth|Сервис проверки  JWT  токена или получения JWT токена по сессии oauth2_proxy|
+
 ## Инструкция по установке
 
 ### Шаг 1. Устновка  главного приложения из HELM
