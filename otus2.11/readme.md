@@ -27,7 +27,11 @@
 
 ### Шаг 1. Устновка  главного приложения из HELM
 
-helm install nginx ingress-nginx/ingress-nginx -f nginx-ingress.yaml
+```
+helm repo add wwtlf2 https://wwtlf.github.io/portfolio-chart/
+helm repo update
+helm install otus wwtlf2/portfolio-chart
+```
 
 ### Шаг 2. Устновка  keycloak
 
