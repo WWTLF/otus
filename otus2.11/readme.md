@@ -53,7 +53,7 @@ helm install otus wwtlf2/portfolio-chart
 kubectl create namespace auth
 helm repo add codecentric https://codecentric.github.io/helm-charts
 helm repo update
-helm install keycloak codecentric/keycloak -f keycloak-values.yaml -n auth
+helm install keycloak codecentric/keycloak -f keycloak-values.yaml -n auth --version "9.5.0"
 ```
 *HELM главного приложения несет с собой БД для keycloak с настроенной конфигурацией*
 
