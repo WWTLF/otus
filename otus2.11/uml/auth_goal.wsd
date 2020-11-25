@@ -93,7 +93,7 @@ activate Browser
     activate Ingress
         Ingress->oauth2: arch.homework/oauth2/callback?code=<code>
         activate oauth2
-            oauth2-->OIDC: http://arch.homework\n/auth/realms/portfolio/protocol/openid-connect/token\n?code=<code>\n&state=<state>
+            oauth2->OIDC: http://arch.homework\n/auth/realms/portfolio/protocol/openid-connect/token\n?code=<code>\n&state=<state>
             activate OIDC
             OIDC->OIDC: Проверка code и state
             OIDC-->oauth2: access_token, refresh_token, id_token
