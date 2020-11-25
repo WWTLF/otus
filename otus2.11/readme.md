@@ -32,13 +32,13 @@
 
 1. Клинет открывает SPA по ссылке arch.homework, SPA загружается в барузер с сервера статических ресурсов
 2. SPA пытается получить данные о пользователе из сервиса profile, запрос проходит через Ingress, который пытается получить токен из oauth2_proxy
-    1. Если запрос содержит сессионную cookie _oauth2_proxy, то _oauth2_proxy возвращает в Ingress access_token
+    1. Если запрос содержит сессионную cookie _oauth2_proxy, то oauth2_proxy возвращает в Ingress access_token
         1. Запрос данных о пользователе проксируется в сервис profile c Authorizaion: Bearer: access_token
         2. Сервис profile проверяет подпись токена, достает из него информацию о пользователе и возвращает ее в JSON формате в SPA
     2. Если сессионной куки нет или она не валидна, oauth2_proxy возвращает 302 REDIRECT на страницу ввода логина и пароля keycloak
         1. Пользователь авторизуется в keycloak, и keycloak редиректит его на callback URL oauth2_proxy, с публичным code
         2. oauth2_proxy обменивает code на токены
-        3. ouath2_proxy создает сессионную cookie и делает 302 REDIRECT на главную страницу SPA
+        3. ouath2_proxy создает сессионную cookie, запоминает токены в своей сессии и делает 302 REDIRECT на главную страницу SPA
         4. GO TO 2.
  
 
