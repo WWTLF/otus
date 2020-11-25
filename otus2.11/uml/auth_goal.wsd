@@ -1,0 +1,109 @@
+@startuml
+autonumber
+Actor User
+Boundary Browser
+box kube-system
+participant Ingress
+end box
+
+box auth
+control oauth2_proxy as oauth2
+control keycloak as OIDC
+end box
+
+box default
+participant "NGINX\nСтатические ресурсы" as WEB
+control profile
+end box
+== Конфигурация OIDC == 
+profile->OIDC: Вызов 2.3\nhttp://arch.homework\n/auth/realms/portfolio=frontend
+activate OIDC
+OIDC-->profile: Конфигурация и ключи OIDC
+deactivate OIDC
+oauth2->OIDC: Вызов 2.3\nhttp://arch.homework\n/auth/realms/portfolio=frontend
+activate OIDC
+OIDC-->oauth2: Конфигурация и ключи OIDC
+deactivate OIDC
+
+== Загрузка SPA ==
+
+User->Browser: arch.homework
+activate Browser
+    Browser->Ingress: GET arch.homework
+    activate Ingress
+        Ingress->WEB: GET: web
+        activate WEB
+        WEB-->Ingress: Статика SPA
+        deactivate WEB
+    Ingress-->Browser:  Статика SPA
+    deactivate Ingress
+
+    Browser->Ingress: GET arch.homework/profile/api/v1/login
+    activate Ingress
+        Ingress->oauth2: GET /oauth2/auth\no+_oauth2_proxy
+        activate oauth2
+        oauth2->oauth2: Проверка сессионной cookie
+alt сессия не валидна
+        oauth2-->Ingress: 401 Unauthorized        
+    Ingress-->Browser: 401 Unauthorized
+else Если сессия валидна
+    oauth2-->Ingress: JWTToken
+    deactivate oauth2
+    Ingress->profile: /login\n+Header: Authorization: Bearer: JWTToken
+    activate profile
+    profile->profile: Проверка подписи JWTToken
+    profile-->Ingress: JSON краткая\nинформация о пользователе
+    deactivate profile
+    Ingress-->Browser: JSON краткая\nинформация о пользователе
+    deactivate Ingress
+end
+    
+    
+Browser-->User: Главная страница
+deactivate Browser
+
+== Авторизация ==
+
+User->Browser: Клик по кнопке Sign in
+activate Browser
+    Browser->oauth2: arch.homework/oauth2/start?rd=/
+    activate oauth2
+    oauth2-->Browser: HTTP 302:\nhttp://arch.homework/auth/realms/portfolio/protocol/openid-connect/auth\n?callback=/oauth2/callback\n&scope=openid profile email\n&state=<state>
+    deactivate oauth2
+
+    Browser->OIDC: http://arch.homework/auth/realms/portfolio/protocol/openid-connect/auth\n?callback=/oauth2/callback\n&scope=openid profile email\n&state=<state>
+    activate OIDC
+    OIDC-->Browser: Страница ввода логина и пароля
+    deactivate OIDC
+Browser-->User: Страница ввода логина и пароля keykloak
+deactivate Browser
+
+User->Browser: Ввод логина и пароля
+activate Browser
+    Browser->Ingress: .../login
+    activate Ingress
+        Ingress->OIDC: .../login
+        activate OIDC
+        OIDC-->Ingress: HTTP 302: arch.homework/oauth2/callback?code=<code>\n+Set-cookie: keycloak_session
+        deactivate OIDC
+    Ingress-->Browser: HTTP 302: arch.homework/oauth2/callback?code=<code>\n+Set-cookie: keycloak_session
+    deactivate Ingress
+
+    Browser->Ingress: arch.homework/oauth2/callback?code=<code>
+    activate Ingress
+        Ingress->oauth2: arch.homework/oauth2/callback?code=<code>
+        activate oauth2
+            oauth2-->OIDC: http://arch.homework\n/auth/realms/portfolio/protocol/openid-connect/token\n?code=<code>\n&state=<state>
+            activate OIDC
+            OIDC->OIDC: Проверка code и state
+            OIDC-->oauth2: access_token, refresh_token, id_token
+            deactivate OIDC
+        oauth2-->Ingress: HTTP 302: arch.homework/ главная страница\nSet-cookie: _oauth2_proxy
+        deactivate oauth2   
+    Ingress-->Browser: HTTP 302: arch.homework/ главная страница\nSet-cookie: _oauth2_proxy
+    deactivate Ingress
+    note right of Browser: Переход на шаг 5
+Browser-->User: Главная страница приложения
+deactivate Browser
+
+@enduml

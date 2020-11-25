@@ -14,13 +14,18 @@
 | № | Серивис | № | Интерфейс | Потребители |Описание интерфейса |
 |---|---------|---|-----------|-------------|--------------------|
 |1|ingress(NGINX)|1.1|arch.homework/auth/|Postman, SPA, Browser|Точка доступа к keycloak для администрирования и получения токенов|
-|1|ingress(NGINX)|1.2|arch.homework/profile/api/v1/|Postman, SPA|Точка доступа к сервису упревления портфелями|
+|1|ingress(NGINX)|1.2|arch.homework/profile/api/v1/|Postman, SPA|Точка доступа к сервису упревления портфелями profile.default.svc.cluster.local:8080|
 |2|Keycloak|2.1|POST /auth/realms/master/protocol/openid-connect/token|Postman, oauth2_proxy|REST API Получение токена пользователя keycloak (implicit flow для posman, code flow  для oauth2_proxy)|
 |2|Keycloak|2.2|POST /auth/admin/realms/portfolio/users|Postman|REST API регистрации нового пользователя|
 |2|Keycloak|2.3|GET /auth/realms/portfolio|profile, oauth2_proxy|Сервис получения конфигурации  OpenID Connet клиента|
 |3|oauth2_proxy|3.1|GET /oauth2/auth|ingress(NGINX)|Сервис проверки  JWT  токена или получения JWT токена по сессии oauth2_proxy|
+|4|profile|4.1|GET /login|Postman, SPA|Получение данных о пользователе по его токену или сессии oauth2_proxy|
+|4|profile|4.1-4.5|GET /portfolios<br/>GET /portfolios/{id}<br/>POST /portfolios<br/>PUT /portfolios/{id}|Postman, SPA|CRUD для работы с портфелями|
+|5|pg|5.1|postgres://keycloak:otus-pg.default.svc.cluster.local:5432/keycloak?sslmode=disable|Keycloak|PostgreSQL БД для Keycloak|
+|5|pg|5.2|postgres://profile:otus-pg.default.svc.cluster.local:5432/profile?sslmode=disable|profile|PostgreSQL БД для profile|
+|6|migration||||Джобы миграции БД|
 
-### Интеграционные сценарии
+### Интеграционные сценарии ###
 
 **Целевая авторизация для Single Page Application**
 
