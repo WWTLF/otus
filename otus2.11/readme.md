@@ -1,26 +1,33 @@
-- [Otus 2.11](#otus-211)
-  * [Архитектура](#Архитектура)
-  * [Инструкция по установке](#Инструкция-по-установке)
-    * [Шаг 1. Устновка главного приложения из HELM](#Шаг-1--Устновка-главного-приложения-из-HELM)
-    * [Шаг 2. Устновка keycloak](#Шаг-2--Устновка-keycloak)
-    * [Шаг 3. Устновка oauth2_proxy](#Шаг-3--Устновка-oauth2_proxy)
-  * [Описание тестовых сценариев](#Описание-тестовых-сценариев)
-
+* [Архитектура](#Архитектура)
+* [Инструкция по установке](#Инструкция-по-установке)
+* [Описание тестовых сценариев](#Описание-тестовых-сценариев)
 
 # Otus 2.11 
 
 ## Архитектура
 
+### Deployment diagram ###
 ![DD](images/portfolio.png)
 
-| № | Серивис | № | Интерфейс | Описание интерфейса |
-|---|---------|---|-----------|---------------------|
-|1|ingress(NGINX)|1.1|arch.homework/auth/|Точка доступа к keycloak для администрирования и получения токенов|
-|1|ingress(NGINX)|1.2|arch.homework/profile/api/v1/|Точка доступа к сервису упревления портфелями|
-|2|Keycloak|2.1|POST /auth/realms/master/protocol/openid-connect/token|REST API Получение токена пользователя keycloak (implicit flow)|
-|2|Keycloak|2.2|POST /auth/admin/realms/portfolio/users|REST API регистрации нового пользователя|
-|2|Keycloak|2.3|GET /auth/realms/portfolio|Сервис получения конфигурации  OpenID Connet клиента|
-|3|oauth2_proxy|3.1|GET /oauth2/auth|Сервис проверки  JWT  токена или получения JWT токена по сессии oauth2_proxy|
+
+**Описание сервисов и интерфейсов**
+| № | Серивис | № | Интерфейс | Потребители |Описание интерфейса |
+|---|---------|---|-----------|-------------|--------------------|
+|1|ingress(NGINX)|1.1|arch.homework/auth/|Postman, SPA, Browser|Точка доступа к keycloak для администрирования и получения токенов|
+|1|ingress(NGINX)|1.2|arch.homework/profile/api/v1/|Postman, SPA|Точка доступа к сервису упревления портфелями|
+|2|Keycloak|2.1|POST /auth/realms/master/protocol/openid-connect/token|Postman, oauth2_proxy|REST API Получение токена пользователя keycloak (implicit flow для posman, code flow  для oauth2_proxy)|
+|2|Keycloak|2.2|POST /auth/admin/realms/portfolio/users|Postman|REST API регистрации нового пользователя|
+|2|Keycloak|2.3|GET /auth/realms/portfolio|profile, oauth2_proxy|Сервис получения конфигурации  OpenID Connet клиента|
+|3|oauth2_proxy|3.1|GET /oauth2/auth|ingress(NGINX)|Сервис проверки  JWT  токена или получения JWT токена по сессии oauth2_proxy|
+
+### Интеграционные сценарии
+
+**Целевая авторизация для Single Page Application**
+
+*Фактичеаская реализация для POSTMAN представлена в разделе "Описание тестовых сценариев"*
+
+**Работа с портфелем**
+Сценарии использования описаны в swagger спецификации: 
 
 ## Инструкция по установке
 
