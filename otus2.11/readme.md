@@ -55,6 +55,8 @@ helm repo add codecentric https://codecentric.github.io/helm-charts
 helm repo update
 helm install keycloak codecentric/keycloak -f keycloak-values.yaml -n auth --version "9.5.0"
 ```
+*9.5.0 - необходимо использовать более старую версию, так как в новой баг с обратной совместимостью манифеста ingress*
+
 *HELM главного приложения несет с собой БД для keycloak с настроенной конфигурацией*
 
 *Если имя релиза главного приложения отличается от otus, то необходимо указать правильно ссылку на БД в файле keycloak-valyues.yaml*
