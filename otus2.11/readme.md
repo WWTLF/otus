@@ -66,6 +66,7 @@
 
 
 **Работа с портфелем**
+
 Сценарии использования описаны в swagger спецификации: https://github.com/WWTLF/otus/blob/master/otus2.11/swagger.yml
 
 ### Исходные коды сервисов
