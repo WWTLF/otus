@@ -1,0 +1,293 @@
+swagger: "2.0"
+produces:
+  - application/json
+consumes:
+  - application/json
+schemes:
+  - http
+
+info:
+  title: Profile
+  version: 0.1.0
+  description: Portfolio Profile service
+
+securityDefinitions:
+  OauthSecurity:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth'
+    tokenUrl: 'https://www.googleapis.com/oauth2/v4/token'
+    scopes:
+      admin: Admin scope
+      user: User scope
+
+paths:
+  /health/liveness:
+    get:
+      tags:
+        - "health"
+      summary: Liveness probe
+      security: [ ]
+      operationId: GetLivenessProbe
+      responses:
+        200:
+          description: Headers
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+
+  /login:
+    get:
+      tags:
+        - "auth"
+      summary: login through oauth2 server
+      operationId: "login"
+      responses:
+        '200':
+          description: login
+          schema:
+            $ref: "#/definitions/principal"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /portfolios:
+    get:
+      tags:
+        - "portfolio"
+      operationId: getList
+      description: Get List of portfolios
+      responses:
+        '200':
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/portfolio_dto"
+          description: Get List of portfolios success
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    post:
+      tags:
+        - "portfolio"
+      description: Create portfolio
+      operationId: create
+      parameters:
+        - in: body
+          name: body
+          description: "Create portfolio DTO"
+          schema:
+            $ref: "#/definitions/portfolio_create_dto"
+      responses:
+        '201':
+          schema:
+            type: object
+            $ref: "#/definitions/portfolio_dto"
+          description: Create portfolio success
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+
+  /portfolios/{id}:
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: Portfolio ID
+    get:
+      tags:
+        - "portfolio"
+      operationId: get
+      description: Get Portfolio by Id
+      responses:
+        '200':
+          description: Portfolio
+          schema:
+            $ref: '#/definitions/portfolio_dto'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    put:
+      tags:
+        - "portfolio"
+      operationId: update
+      description: Update Portfolio by Id
+      parameters:
+        - in: body
+          name: body
+          required: true
+          description: Portfolio DTO
+          schema:
+            $ref: '#/definitions/portfolio_dto'
+      responses:
+        '200':
+          description: Portfolio
+          schema:
+            $ref: '#/definitions/portfolio_dto'
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+
+security:
+  - OauthSecurity:
+      - "user"
+
+definitions:
+  portfolio_dto:
+    type: object
+    required:
+      - name
+      - broker
+      - state
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      user_id:
+        type: string
+      amount:
+        type: number
+      state:
+        type: string
+        default: 'EMPTY'
+        enum:
+          - 'DRAFT'
+          - 'EMPTY'
+          - 'MANUAL'
+          - 'OPTIMIZED'
+          - 'NEED_APPROVE'
+          - 'IN_ANALYZES'
+      broker:
+        type: string
+      EAR:
+        description: Expected annual return
+        type: number
+        default: 0.0
+      AV:
+        description: Annual Volatility
+        type: number
+        default: 0.0
+      SR:
+        title: Sharpe ratio
+        description: Sharpe ratio
+        type: number
+        default: 0.0
+      RRR:
+        description: Risk return ratio
+        $ref: "#/definitions/RRR"
+      created_at:
+        type: integer
+      period:
+        type: number
+        default: 0.0
+      autoFlag:
+        type: boolean
+      assets:
+        type: object
+        additionalProperties:
+          type: integer
+
+  portfolio_create_dto:
+    type: object
+    required:
+      - name
+      - broker
+      - autoFlag
+    properties:
+      name:
+        type: string
+      broker:
+        type: string
+      autoFlag:
+        type: boolean
+      RRR:
+        description: Risk return ratio
+        $ref: "#/definitions/RRR"
+      amount:
+        type: number
+      period:
+        type: number
+
+  error:
+    type: object
+    required:
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
+
+  principal:
+    type: object
+    properties:
+      exp:
+        type: integer
+      iat:
+        type: integer
+      auth_time:
+        type: integer
+      jti:
+        type: string
+      iss:
+        type: string
+      aud:
+        type: array
+        items:
+          type: string
+      sub:
+        type: string
+      typ:
+        type: string
+      azp:
+        type: string
+      #      session_state:
+      #        type: string
+      acr:
+        type: string
+      resource_access:
+        type: object
+        properties:
+          account:
+            type: object
+            properties:
+              roles:
+                type: array
+                items:
+                  type: string
+      scope:
+        type: string
+      email_verified:
+        type: boolean
+      name:
+        type: string
+      preferred_username:
+        type: string
+      given_name:
+        type: string
+      family_name:
+        type: string
+      email:
+        type: string
+
+  RRR:
+    type: string
+    description: Risk-return ratio
+    title: Risk-return ratio
+    enum:
+      - MIN_RISK
+      - OPTIMAL
+      - MAX_RETURN
