@@ -44,7 +44,8 @@
 
 ![Сиквенс входа](out/uml/auth_goal/auth_goal.png)
 
-** Тестовый сценарий для POSTAM (implicit flow) **
+**Тестовый сценарий для Postman (implicit flow)**
+![Сиквенс тест](out/uml/auth_test/auth_test.png)
 
 
 **Работа с портфелем**
