@@ -147,3 +147,7 @@ metadata:
 ```
 kubectl apply -f oauth2-deployment.yaml
 ```
+## Запуск теста
+```
+newman run otus2.11-boris_ershov.postman_collection.json
+```
