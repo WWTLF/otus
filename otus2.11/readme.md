@@ -1,5 +1,10 @@
 * [Архитектура](#Архитектура)
 * [Инструкция по установке](#Инструкция-по-установке)
+    + Шаг 1. Устновка главного приложения из HELM
+    + Шаг 2. Устновка keycloak
+        + Шаг 2.1 Настройка CoreDNS
+    + Шаг 3. Устновка oauth2_proxy
+    + Шаг 4. Проверка успешности установки
 * [Описание тестовых сценариев](#Описание-тестовых-сценариев)
 
 # Otus 2.11 
@@ -147,6 +152,26 @@ metadata:
 ```
 kubectl apply -f oauth2-deployment.yaml
 ```
+
+### Шаг 4. Проверка успешности установки
+После успешной становки должно остаться только два пода в пространстве default
+```
+kubectl get pods
+NAME                                                       READY   STATUS    RESTARTS   AGE
+otus-pg-0                                                  1/1     Running   0          10m
+otus-portfolio-chart-profile-deployment-64778d9cf9-2m47w   1/1     Running   2          10m
+```
+
+И два пода в пространстве auth
+
+```
+kubectl get pods -n auth                                                                                                              ─╯
+NAME                            READY   STATUS    RESTARTS   AGE
+keycloak-0                      1/1     Running   0          7m46s
+oauth2-proxy-75fb469c66-wvsq6   1/1     Running   0          3m44s
+```
+Установка keycloak может занять несколько минут
+
 ## Запуск теста
 ```
 newman run otus2.11-boris_ershov.postman_collection.json
