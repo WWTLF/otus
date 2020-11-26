@@ -1,0 +1,81 @@
+@startuml
+autonumber
+Actor Postman
+box kube-system
+participant Ingress
+end box
+
+box auth
+control oauth2_proxy as oauth2
+control keycloak as OIDC
+end box
+
+box default
+control profile
+end box
+== Конфигурация OIDC == 
+profile->OIDC: Вызов 2.3\nhttp://arch.homework\n/auth/realms/portfolio=frontend
+activate OIDC
+OIDC-->profile: Конфигурация и ключи OIDC
+deactivate OIDC
+oauth2->OIDC: Вызов 2.3\nhttp://arch.homework\n/auth/realms/portfolio=frontend
+activate OIDC
+OIDC-->oauth2: Конфигурация и ключи OIDC
+deactivate OIDC
+
+== Получение токена администратора для регистрации пользователей ==
+
+Postman->Ingress: POST\narch.homework\n/auth/realms/master/protocol/openid-connect/token
+activate Ingress
+    Ingress->OIDC: POST\n/auth/realms/master/protocol/openid-connect/token
+    activate OIDC 
+    OIDC-->Ingress:access_token (администратора)
+    deactivate OIDC
+Ingress-->Postman: access_token (администратора)
+deactivate Ingress
+
+== Регистрация пользователя ==
+
+Postman->Ingress: POST arch.homework\n/auth/admin/realms/portfolio/users\n+Header Authorization: Bearer: access_token
+activate Ingress
+    Ingress->OIDC: POST\n/auth/realms/master/protocol/openid-connect/token\n+Header Authorization: Bearer: access_token
+    activate OIDC 
+    OIDC-->Ingress: HTTP 201 Created
+    deactivate OIDC
+Ingress-->Postman:  HTTP 201 Created
+deactivate Ingress
+
+== Аутентификация пользователя (Implicit flow) ==
+
+Postman->Ingress: POST\narch.homework\n/auth/realms/master/protocol/openid-connect/token
+activate Ingress
+    Ingress->OIDC: POST\n/auth/realms/master/protocol/openid-connect/token
+    activate OIDC 
+    OIDC-->Ingress:access_token, refresh_token, id_token
+    deactivate OIDC
+Ingress-->Postman: access_token, refresh_token, id_token
+deactivate Ingress
+
+== Авторизация в приложении ==
+
+Postman->Ingress: GET arch.homework/profile/api/v1/login\n+Header Authorization: Bearer: access_token
+activate Ingress
+    Ingress-->oauth2: GET /oauth2/auth\no\n+Header Authorization: Bearer: access_token
+    activate oauth2
+    oauth2->oauth2:  Проверка подписи access_token
+alt access_token не прошел проверку
+    oauth2-->Ingress: 401 Unauthorized
+    Ingress-->Postman: : 401 Unauthorized
+else Проверка пройдена успешно
+    oauth2->Ingress: 200 OK +Header: X-AUTH-TOKEN    
+    deactivate oauth2
+    Ingress->profile: /login\n+Header Authorization: Bearer: access_token
+    activate profile
+    profile->profile:  Проверка подписи access_token    
+    profile-->Ingress: JSON краткая\nинформация о пользователе
+    deactivate profile
+Ingress-->Postman: JSON краткая\nинформация о пользователе
+deactivate Ingress
+end
+
+@enduml

@@ -40,18 +40,18 @@ activate Browser
 
     Browser->Ingress: GET arch.homework/profile/api/v1/login
     activate Ingress
-        Ingress->oauth2: GET /oauth2/auth\no+_oauth2_proxy
+        Ingress->oauth2: GET /oauth2/auth\no+COOKIE _oauth2_proxy
         activate oauth2
         oauth2->oauth2: Проверка сессионной cookie
 alt сессия не валидна
         oauth2-->Ingress: 401 Unauthorized        
     Ingress-->Browser: 401 Unauthorized
 else Если сессия валидна
-    oauth2-->Ingress: JWTToken
+    oauth2-->Ingress: Header: X-AUTH-TOKEN=access_token
     deactivate oauth2
-    Ingress->profile: /login\n+Header: Authorization: Bearer: JWTToken
+    Ingress->profile: /login\n+Header: Authorization: Bearer: access_token
     activate profile
-    profile->profile: Проверка подписи JWTToken
+    profile->profile: Проверка подписи access_token
     profile-->Ingress: JSON краткая\nинформация о пользователе
     deactivate profile
     Ingress-->Browser: JSON краткая\nинформация о пользователе
