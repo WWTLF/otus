@@ -1,0 +1,52 @@
+@startuml
+autonumber
+Actor Postman
+Control "Оркестратор" as Saga
+Control Deals as "Сервис сделок" 
+Control "Профиль клиента" as Profile
+Control "Сервис уведомлений" as notification
+
+Postman->Profile: POST .../portfolios
+activate Profile
+Profile->Profile: Сохранение данных о портфеле в БД
+Profile-->Postman: JSON информация о портфеле
+deactivate
+
+Postman->Deals: POST: .../deals
+activate Deals
+    Deals->Saga: POST: ../register
+    activate Saga
+    Saga-->Deals: JSON {SagaID}    
+Deals-->Postman: JSON: Информация о заказе
+deactivate Deals
+
+Saga -[#blue,bold]->> Profile: PROFILE_TOPIC: **APPROVE_DEAL** \n+ {deals_context}
+deactivate Saga
+activate Profile
+Profile->Profile: Проверить баланс
+alt На заказ есть средства
+Profile-[#blue,bold]->>Saga: SAGA_SERVER_TOPIC: **ORDER_APPROVEVD**\n+{message}
+activate Saga
+Saga-[#blue,bold]->>Deals: DEALS_TOPIC: **APPROVE_DEAL**
+activate Deals
+Deals->Deals: Перевести заказ в статус: Проведен
+else На заказ недостаточно средств на балансе
+Profile-[#blue,bold]->>Saga: SAGA_SERVER_TOPIC: **ORDER_REJECTED**\n+{message}
+deactivate Profile
+Saga-[#blue,bold]->>Deals: DEALS_TOPIC: **REJECT_DEAL**\n+ {event}
+deactivate Saga
+Deals->Deals: Перевести заказ в статус: Отклонен
+end
+Deals-[#blue,bold]->>Saga: SAGA_SERVER_TOPIC: **DEAL_UPDATED**
+deactivate Deals
+activate Saga
+Saga-[#blue,bold]->>notification: NOTIFICATION_TOPIC: **NOTIFY**\n+{message}
+deactivate Saga
+activate notification
+notification->notification: Сохранить сообщение в БД
+notification-[#blue,bold]->>Saga:SAGA_SERVER_TOPIC: **NOTIFIED**
+deactivate notification
+activate Saga
+Saga->Saga: Завершить сагу
+deactivate Saga
+@enduml
