@@ -20,7 +20,7 @@ activate Deals
 Deals-->Postman: JSON: Информация о заказе
 deactivate Deals
 
-Saga -[#blue,bold]->> Profile: PROFILE_TOPIC: **APPROVE_DEAL** \n+ {deals_context}
+Saga -[#blue,bold]->> Profile: PROFILE_TOPIC: **APPROVE_ORDER** \n+ {deals_context}
 deactivate Saga
 activate Profile
 Profile->Profile: Проверить баланс

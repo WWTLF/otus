@@ -1,0 +1,615 @@
+{
+	"info": {
+		"_postman_id": "e1841c38-eb35-472b-9075-90525cfc3b63",
+		"name": "otus2.15/boris_ershov",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Step 0. Получение списка уведомлений",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set('notifications', responseJSON.length)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/notification/api/v1/messages/",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"notification",
+						"api",
+						"v1",
+						"messages",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP 1.  Получение токена по паролю для первого пользователя (implicit flow)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set('access_token', responseJSON['access_token'])",
+							"user1 = pm.collectionVariables.get(\"User1\")",
+							"pm.test(\"Получение access_token для \" + user1, ()=>{",
+							"    pm.expect(pm.response.text()).to.include(\"access_token\");    ",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "frontend",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "31fc5171-4500-4050-863b-2dba1b793e28",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "openid profile email",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "user",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://auth.risqless.io/auth/realms/portfolio/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"auth",
+						"risqless",
+						"io"
+					],
+					"path": [
+						"auth",
+						"realms",
+						"portfolio",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP 2. Проверка авторизации по токену для пользователя 1 в главном приложении",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"user1 = 'user'",
+							"pm.collectionVariables.set('sub1', responseJSON['sub'])",
+							"pm.test(\"Пользователь \" + user1 + \" успешно авторизован по токену\", ()=>{",
+							"    pm.expect(responseJSON['email']).to.eql(user1 + \"@test.com\");",
+							"})",
+							"pm.collectionVariables.set('PortfolioName', \"user\" + _.random(50, 10000))"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true,
+				"followRedirects": false
+			},
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{access_token}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/profile/api/v1/login",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"profile",
+						"api",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 4. Создание пустого инвестиционного портфеля для пользователя 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"user1 = pm.collectionVariables.get(\"User1\")",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set('free_amount', responseJSON['free_amount'])",
+							"",
+							"pm.test(\"Ивестиционный портфель \"+ user1 +\" создан\", () => {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var responseJSON = JSON.parse(responseBody)",
+							"pm.collectionVariables.set(\"PortfolioID1\", responseJSON['id'])"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"RRR\": \"MAX_RETURN\",\n\"amount\": 1500,\n\"autoFlag\": false,\n\"broker\": \"SBER\",\n\"name\": \"{{PortfolioName}}\",\n\"period\": 12\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/profile/api/v1/portfolios",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"profile",
+						"api",
+						"v1",
+						"portfolios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5. Создание первой сделки",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"comment\": \"Тестовая сделка 1\",  \n  \"deal_date\": 1607713049,\n  \"deal_items\": [\n    {\n      \"broker_fee\": 10,\n      \"broker_fee_percent\": 0.1,\n      \"cost\": 100,\n      \"price\": 10,\n      \"ticker\": \"AAPL\",\n      \"total\": 110,\n      \"value\": 10\n    }\n  ],  \n  \"portfolio_id\": {{PortfolioID1}},\n  \"request_id\": \"string\",\n  \"status\": \"DRAFT\"  \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/deals/api/v1/deals",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"deals",
+						"api",
+						"v1",
+						"deals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP 6. Получение своего портфеля по id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"var envPortfolioID = pm.collectionVariables.get('PortfolioID1')",
+							"var envSub1 = pm.collectionVariables.get('sub1')",
+							"",
+							"",
+							"pm.test(\"Проверка принадлежности созданного партфеля пользователю\", () => {",
+							"  pm.response.to.have.status(200);",
+							"  pm.expect(envSub1).to.eql(responseJSON['user_id'])",
+							"});",
+							"",
+							"",
+							"pm.test(\"Проверка совпадения запрашиваемого и возвращаемого id портфеля\", () => {",
+							"  pm.expect(envPortfolioID).to.eql(responseJSON['id'])",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/profile/api/v1/portfolios/{{PortfolioID1}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"profile",
+						"api",
+						"v1",
+						"portfolios",
+						"{{PortfolioID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP 7.  Проверка, что сумма уменьшилась",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"var envPortfolioID = pm.collectionVariables.get('PortfolioID1')",
+							"var envSub1 = pm.collectionVariables.get('sub1')",
+							"lastFreeAmout = pm.collectionVariables.get('free_amount')",
+							"pm.test(\"Проверка принадлежности созданного партфеля пользователю\", () => {",
+							"  pm.response.to.have.status(200);",
+							"  pm.expect(envSub1).to.eql(responseJSON['user_id'])",
+							"});",
+							"",
+							"console.log('responseJSON[\\'free_amount\\']=',responseJSON['free_amount'])",
+							"console.log('lastFreeAmout=',lastFreeAmout)",
+							"",
+							"pm.test(\"Проверка что сумма уменьшилась\", () => {",
+							"  pm.expect(parseInt(responseJSON['free_amount'])).to.lt(parseInt(lastFreeAmout))",
+							"});",
+							"",
+							"pm.collectionVariables.set('free_amount', responseJSON['free_amount'])",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/profile/api/v1/portfolios/{{PortfolioID1}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"profile",
+						"api",
+						"v1",
+						"portfolios",
+						"{{PortfolioID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 5. Создание второй сделки",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"comment\": \"Тестовая сделка 2\",  \n  \"deal_date\": 1607713049,\n  \"deal_items\": [\n    {\n      \"broker_fee\": 150,\n      \"broker_fee_percent\": 0.1,\n      \"cost\": 1500,\n      \"price\": 100,\n      \"ticker\": \"AAPL\",\n      \"total\": 1650,\n      \"value\": 15\n    }\n  ],  \n  \"portfolio_id\": {{PortfolioID1}},\n  \"request_id\": \"string\",\n  \"status\": \"DRAFT\"  \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseURL}}/deals/api/v1/deals",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"deals",
+						"api",
+						"v1",
+						"deals"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "STEP 8.  Проверка, что сумма не уменьшилась",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"var envPortfolioID = pm.collectionVariables.get('PortfolioID1')",
+							"var envSub1 = pm.collectionVariables.get('sub1')",
+							"lastFreeAmout = pm.collectionVariables.get('free_amount')",
+							"pm.test(\"Проверка принадлежности созданного партфеля пользователю\", () => {",
+							"  pm.response.to.have.status(200);",
+							"  pm.expect(envSub1).to.eql(responseJSON['user_id'])",
+							"});",
+							"",
+							"console.log('responseJSON[\\'free_amount\\']=',responseJSON['free_amount'])",
+							"console.log('lastFreeAmout=',lastFreeAmout)",
+							"",
+							"pm.test(\"Проверка что сумма уменьшилась\", () => {",
+							"  pm.expect(parseInt(responseJSON['free_amount'])).to.eql(parseInt(lastFreeAmout))",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/profile/api/v1/portfolios/{{PortfolioID1}}",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"profile",
+						"api",
+						"v1",
+						"portfolios",
+						"{{PortfolioID1}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Step 9. Получение списка уведомлений",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody)",
+							"var diff = responseJSON.length - pm.collectionVariables.get('notifications') ",
+							"pm.test(\"Проверка что создалость два сообщения\", () => {",
+							"  pm.expect(diff).to.eql(2)",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseURL}}/notification/api/v1/messages/",
+					"host": [
+						"{{BaseURL}}"
+					],
+					"path": [
+						"notification",
+						"api",
+						"v1",
+						"messages",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BaseURL",
+			"value": "http://risqless.io"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "admin_access_token",
+			"value": ""
+		},
+		{
+			"key": "Password1",
+			"value": ""
+		},
+		{
+			"key": "Password2",
+			"value": ""
+		},
+		{
+			"key": "User1",
+			"value": ""
+		},
+		{
+			"key": "User2",
+			"value": ""
+		},
+		{
+			"key": "PortfolioID1",
+			"value": ""
+		},
+		{
+			"key": "sub1",
+			"value": ""
+		},
+		{
+			"key": "sub2",
+			"value": ""
+		},
+		{
+			"key": "PortfolioName",
+			"value": ""
+		},
+		{
+			"key": "free_amount",
+			"value": ""
+		},
+		{
+			"key": "notifications",
+			"value": ""
+		}
+	]
+}
