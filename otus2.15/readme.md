@@ -17,6 +17,8 @@
 |11|stockloader|CronJob наполнения спрачников ценных бумаг|default|
 |12|Kafka|Брокер Kafka|integreation|
 |13|ZooKeeper|ZooKeeper|integreation|
+|14|Analizer|Сервис подбора ценных бумаг|default|
+|15|web-client|NGINX сервер хранения статических ресурсов для SPA|default|
 ## Описание интерфейсов
 | № | Сервис | № | Интерфейс | Потребители |Описание интерфейса |API Spec|
 |---|--------|---|-----------|-------------|--------------------|--------|
@@ -40,6 +42,9 @@
 |7|deals|7.2|KAFKA Topic: DEALS_TOPIC|saga-machine|Топик для приема команд по одобрению сделок|Сущность: deal_context<br/>[спецификация](https://gitlab.com/portfolio_counselor/deals-src/-/blob/master/deals.yaml)|
 |8|notifications|8.1|KAFKA Topic:  NOTIFICATION_TOPIC|saga-machine|Топик для приема команд по отправке уведомлений|Сущность: notoficationDTO<br/>[спецификация](https://gitlab.com/portfolio_counselor/notification/-/blob/master/notification.yaml)|
 |9|notifications|9.1|KAFKA Topic:  SAGA_SERVER_POIC|profile<be/>deals<br/>notification|Топик получения событий от участников саги|Сущность: Event<br/>[спецификация](https://gitlab.com/portfolio_counselor/saga-machine-src/-/blob/master/saga.yaml)|
+|10|stock|10.1|POST /stock/daily|profile|Сервис загрузки истории ценны бумаг на бирже|Сущность: asset_daily_data<br/>[спецификация](https://gitlab.com/portfolio_counselor/stock-src/-/blob/master/stock.yaml)|
+|10|stock|10.2|POST /dictionaries/assets|profile<br/>analizer|Сервис получения базовой информации о ценной бумаге включая ее цену|Сущность: asset_dict<br/>[спецификация](https://gitlab.com/portfolio_counselor/stock-src/-/blob/master/stock.yaml)|
+
 
 ## Функциональные требования и пользовательские истории ##
 
@@ -130,6 +135,9 @@ TODO
 2. Сервис уведомлений сохраняет сообщение в таблицу notifications
 3. Сервис уведомлений отправляет событие NOTIFIED оркестратору. 
 
+
+### US 4. Я как клиент, хочу чтобы получить рекомендацию по наполнению портфеля ценных бумаг
+TODO...
 
 ## Нефункциональные требования ##
 
