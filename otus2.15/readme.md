@@ -41,7 +41,8 @@
 |7|deals|7.1|POST /deals|SPA, Postman|CRUD сервисы работы со сделкамми|[спецификация](https://gitlab.com/portfolio_counselor/deals-src/-/blob/master/deals.yaml)|
 |7|deals|7.2|KAFKA Topic: DEALS_TOPIC|saga-machine|Топик для приема команд по одобрению сделок|Сущность: deal_context<br/>[спецификация](https://gitlab.com/portfolio_counselor/deals-src/-/blob/master/deals.yaml)|
 |8|notifications|8.1|KAFKA Topic:  NOTIFICATION_TOPIC|saga-machine|Топик для приема команд по отправке уведомлений|Сущность: notoficationDTO<br/>[спецификация](https://gitlab.com/portfolio_counselor/notification/-/blob/master/notification.yaml)|
-|9|notifications|9.1|KAFKA Topic:  SAGA_SERVER_POIC|profile<be/>deals<br/>notification|Топик получения событий от участников саги|Сущность: Event<br/>[спецификация](https://gitlab.com/portfolio_counselor/saga-machine-src/-/blob/master/saga.yaml)|
+|9|saga-machine|9.1|KAFKA Topic:  SAGA_SERVER_POIC|profile<br/>deals<br/>notification|Топик получения событий от участников саги|Сущность: Event<br/>[спецификация](https://gitlab.com/portfolio_counselor/saga-machine-src/-/blob/master/saga.yaml)|
+|9|saga-machine|9.2|POST  /register|profile<br/>deals|Сервис регистрации экземляра саги|Сущность: body в теле запроса /register<br/>[спецификация](https://gitlab.com/portfolio_counselor/saga-machine-src/-/blob/master/saga.yaml)|
 |10|stock|10.1|POST /stock/daily|profile|Сервис загрузки истории ценны бумаг на бирже|Сущность: asset_daily_data<br/>[спецификация](https://gitlab.com/portfolio_counselor/stock-src/-/blob/master/stock.yaml)|
 |10|stock|10.2|POST /dictionaries/assets|profile<br/>analizer|Сервис получения базовой информации о ценной бумаге включая ее цену|Сущность: asset_dict<br/>[спецификация](https://gitlab.com/portfolio_counselor/stock-src/-/blob/master/stock.yaml)|
 
@@ -70,7 +71,7 @@ TODO
 
 
 ### US 3. Я как клиент, хочу чтобы после создания мной информации о действиях на бирже (создание сделок), информация о моей исторической позиции обновилась в портфеле и я получил уведомление
-Процесс реализуется с помощью оркестратора по паттерну SAGA. Архитектурное описание самого сервиса оркестрации описано в ДЗ по паттерну SAGA.
+Процесс реализуется с помощью оркестратора по паттерну SAGA. Архитектурное описание самого сервиса оркестрации описано NFR 2.
 
 #### FR 3.1 Статусная машина  MANUAL_CREATE_ORDER  (Ручное создание сделки)
 ![Статусная машина саги](images/MANUAL_CREATE_ORDER.jpg)
@@ -93,7 +94,7 @@ TODO
 |------------|--------------|----------------------------|----------|
 |1-3|Клиент создает пустой инвестиционный портфель|Запрос:<br/>Описание по схеме  POST /portfilios [спецификация](https://gitlab.com/portfolio_counselor/profile-src/-/blob/master/profile.yaml)<br/>Ответ: id  портфеля + параметры из запроса|US 1.|
 |4-7|Клиент создает черновик сделки для портфеля из шага 3|Запрос:<br/>Описание по схеме  POST /deals [спецификация](https://gitlab.com/portfolio_counselor/profile-src/-/blob/master/profile.yaml)<br/>Ответ: id  сделки + параметры из запроса|US 2|
-|5-6|Сервис сделок регистрирует новый экземпляр саги|Запрос:<br/> POST /register [спецификация](https://gitlab.com/portfolio_counselor/saga-machine-src/-/blob/master/saga.yaml)<br/>Ответ: id саги|Будет описано в ДЗ по САГА|
+|5-6|Сервис сделок регистрирует новый экземпляр саги|Запрос:<br/> POST /register [спецификация](https://gitlab.com/portfolio_counselor/saga-machine-src/-/blob/master/saga.yaml)<br/>Ответ: id саги|NFR 2|
 |8|Оркестратор отпрвляет асинхронный запрос в PROFILE_TOPIC|Команда APPROVE_ORDER, контекст команды deals_context, [спецификация](https://gitlab.com/portfolio_counselor/deals-src/-/blob/master/deals.yaml)||
 |9|Сервис ведения портфеля проверяет баланс ||FR 3.3|
 |10|Если проверка баланса прошла успешно, сервис профиля генерирует событие ORDER _APPROVED |Событие ORDER _APPROVED, контекст   события error, [спецификация](https://gitlab.com/portfolio_counselor/profile-src/-/blob/master/profile.yaml)|FR 3.3|
@@ -105,7 +106,7 @@ TODO
 |16|Сервис сделки возвращает управление оркестратору событием Событие ORDER _REJECTED|||
 |17|Оркестратор дает команду на уведомление клиенту NOTIFY|Команда NOTIFY, контекст   события error, [спецификация](https://gitlab.com/portfolio_counselor/profile-src/-/blob/master/profile.yaml)|FR 3.5|
 
-#### FR 3.3 Обновление исторической позиции
+#### FR 3.3 Обновление исторической позиции (сервис profile)
 
 1. Сервис вычисляет суммарную стоимость всех позиций по сделке из deals_context включая комиссию
 2. Сервис ведения портфеля проверяет остаток свободных для инвестирования средств по таблице potrfolios полю free_amount
@@ -122,14 +123,14 @@ TODO
 3. Поле code заполняется кодом 200 в случае успеха и кодом 400 в случае отказа в проведении сделки
 4. Поле message заполняется сообщением для клиента
 
-#### FR 3.4 Обновление статуса сделки
+#### FR 3.4 Обновление статуса сделки (сервис deals)
 
 1. Оркестратор  дает команду сервису сделок сменить статус сделки на проведена или отклонена командой APPROVE_DEAL и REJECT_DEAL соответственно.
     1. Идентификатор сделки передается в deal_context
 2. Статус сделке обновляется в таблице deals.
 3. Сервис сделок отправляет  событие в оркестратор DEALS_UPDATED
 
-#### FR 3.5 Уведомление лкиента
+#### FR 3.5 Уведомление лкиента (сервис notifications)
 
 1. Оркестратор отправляет команду NOTIFY в NOTIFICATION_TOPIC
 2. Сервис уведомлений сохраняет сообщение в таблицу notifications
@@ -146,15 +147,19 @@ TODO...
 #### NFR 1.1 Авторизация
 Требования описаны тут: https://github.com/WWTLF/otus/tree/master/otus2.11
 
-### NFR2. Оркестратор
-
-Архитектура будет описана в ДЗ по SAGA.
+### NFR 2. Оркестратор (сервис saga-machine)
 
 1. Оркестратор обменивается командами и событиями по выделенным на каждый сервис топикам в формате JSON в структуре [Event](https://gitlab.com/portfolio_counselor/saga-machine-src/-/blob/master/saga.yaml)
     1. Каждый сервис может передавать произвольный контекст в событии. 
     2. Каждая команда содержит набор всех контекстов от всех сервисов участников саги. 
 2. Оркестратор в своей реализации имеет аккумулятор в БД, который используется для обмена контекстами. 
 
+#### NFR 2.1 Регистрация SAGA
+
+1. Потребитель сервиса регистрирует экземляр SAGA вызовом REST сервиса 
+
+#### NFR 2.2 Модель данных
+TODO ..
 
 # Инструкция по установке
 
