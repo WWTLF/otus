@@ -33,7 +33,7 @@
 |5|pg|5.2|postgres://profile:otus-pg.default.svc.cluster.local:5432/profile?sslmode=disable|profile|PostgreSQL БД для profile||
 |5|pg|5.3|postgres://deals:otus-pg.default.svc.cluster.local:5432/deals?sslmode=disable|deals|PostgreSQL БД для deals||
 |5|pg|5.4|postgres://stock:otus-pg.default.svc.cluster.local:5432/stock?sslmode=disable|stock|PostgreSQL БД для stock||
-|5|pg|5.5|postgres://notifications:otus-pg.default.svc.cluster.local:5432/notifications?sslmode=disable|notifications|PostgreSQL БД для stock||
+|5|pg|5.5|postgres://notifications:otus-pg.default.svc.cluster.local:5432/notifications?sslmode=disable|notifications|PostgreSQL БД для notification||
 |5|pg|5.6|postgres://saga:otus-pg.default.svc.cluster.local:5432/saga?sslmode=disable|saga-machine|PostgreSQL БД для saga-machine||
 |6|migration||||Джобы миграции БД||
 |7|deals|7.1|POST /deals|SPA, Postman|CRUD сервисы работы со сделкамми|[спецификация](https://gitlab.com/portfolio_counselor/deals-src/-/blob/master/deals.yaml)|
