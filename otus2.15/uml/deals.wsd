@@ -25,7 +25,7 @@ deactivate Saga
 activate Profile
 Profile->Profile: Проверить баланс
 alt На заказ есть средства
-Profile-[#blue,bold]->>Saga: SAGA_SERVER_TOPIC: **ORDER_APPROVEVD**\n+{message}
+Profile-[#blue,bold]->>Saga: SAGA_SERVER_TOPIC: **ORDER_APPROVED**\n+{message}
 activate Saga
 Saga-[#blue,bold]->>Deals: DEALS_TOPIC: **APPROVE_DEAL**
 activate Deals
