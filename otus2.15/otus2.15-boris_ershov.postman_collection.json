@@ -263,7 +263,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"comment\": \"Тестовая сделка 1\",  \n  \"deal_date\": 1607713049,\n  \"deal_items\": [\n    {\n      \"broker_fee\": 10,\n      \"broker_fee_percent\": 0.1,\n      \"cost\": 100,\n      \"price\": 10,\n      \"ticker\": \"AAPL\",\n      \"total\": 110,\n      \"value\": 10\n    }\n  ],  \n  \"portfolio_id\": {{PortfolioID1}},\n  \"request_id\": \"string\",\n  \"status\": \"DRAFT\"  \n}",
+					"raw": "{\n  \"comment\": \"Тестовая сделка 1\",  \n  \"deal_date\": 1607713049,\n  \"deal_items\": [\n    {\n      \"broker_fee\": 10,\n      \"broker_fee_percent\": 0.1,\n      \"cost\": 100,\n      \"price\": 10,\n      \"ticker\": \"AAPL\",\n      \"total\": 110,\n      \"value\": 10\n    }\n  ],  \n  \"portfolio_id\": {{PortfolioID1}},\n  \"request_id\": \"GUID1{{PortfolioID1}}\",\n  \"status\": \"DRAFT\"  \n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -417,7 +417,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"comment\": \"Тестовая сделка 2\",  \n  \"deal_date\": 1607713049,\n  \"deal_items\": [\n    {\n      \"broker_fee\": 150,\n      \"broker_fee_percent\": 0.1,\n      \"cost\": 1500,\n      \"price\": 100,\n      \"ticker\": \"AAPL\",\n      \"total\": 1650,\n      \"value\": 15\n    }\n  ],  \n  \"portfolio_id\": {{PortfolioID1}},\n  \"request_id\": \"string\",\n  \"status\": \"DRAFT\"  \n}",
+					"raw": "{\n  \"comment\": \"Тестовая сделка 2\",  \n  \"deal_date\": 1607713049,\n  \"deal_items\": [\n    {\n      \"broker_fee\": 150,\n      \"broker_fee_percent\": 0.1,\n      \"cost\": 1500,\n      \"price\": 100,\n      \"ticker\": \"AAPL\",\n      \"total\": 1650,\n      \"value\": 15\n    }\n  ],  \n  \"portfolio_id\": {{PortfolioID1}},\n  \"request_id\": \"GUID2{{PortfolioID1}}\",\n  \"status\": \"DRAFT\"  \n}",
 					"options": {
 						"raw": {
 							"language": "json"
